@@ -5,7 +5,7 @@ COPY . .
 RUN mvn clean package -DskipTests
 
 # Run stage
-FROM eclipse-temurin:17-jre-slim
+FROM quay.io/openjdk/openjdk:17-slim
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
 EXPOSE 8088
