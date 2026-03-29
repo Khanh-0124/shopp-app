@@ -23,6 +23,8 @@ export class RegisterComponent {
   address = signal<string>('');
   isAccepted = signal<boolean>(false);
   dateOfBirth = signal<string>(this.getDefaultDob());
+  showPassword = signal<boolean>(false);
+  showRetypePassword = signal<boolean>(false);
 
   // Error signals
   phoneError = signal<string>('');

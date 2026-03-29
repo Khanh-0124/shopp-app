@@ -7,11 +7,14 @@ import { LoginComponent } from './login/login';
 import { RegisterComponent } from './register/register';
 import { DetailProductComponent } from './detail-product/detail-product';
 
+import { LoadingComponent } from './loading/loading';
+
 @Component({
   selector: 'app-root',
   standalone: true,
   imports: [
     RouterOutlet,
+    LoadingComponent,
     HomeComponent,
     // OrderComponent,
     // OrderConfirmComponent,
@@ -19,7 +22,10 @@ import { DetailProductComponent } from './detail-product/detail-product';
     // RegisterComponent
     // DetailProductComponent
   ],
-  template: '<router-outlet></router-outlet>',
+  template: `
+    <app-loading></app-loading>
+    <router-outlet></router-outlet>
+  `,
   styleUrl: './app.scss'
 })
 export class App {

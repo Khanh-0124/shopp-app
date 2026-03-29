@@ -11,8 +11,8 @@
                     <div class="mt-5"></div>
                     <div class="form-group password-field">
                         <label for="password">Mật khẩu</label>
-                        <input type="password" placeholder="ít nhất 3 ký tự" class="form-control" id="password" [ngModel]="password()" (ngModelChange)="password.set($event)">
-                        <i class="password-toggle fas fa-eye-slash"></i>
+                        <input [type]="showPassword() ? 'text' : 'password'" placeholder="ít nhất 3 ký tự" class="form-control" id="password" [ngModel]="password()" (ngModelChange)="password.set($event)">
+                        <i [class]="showPassword() ? 'password-toggle fas fa-eye' : 'password-toggle fas fa-eye-slash'" (click)="showPassword.set(!showPassword())"></i>
                         <div class="divider-nospace"></div>
                     </div>
                     <div class="form-group">

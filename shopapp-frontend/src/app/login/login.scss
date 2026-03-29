@@ -20,20 +20,24 @@
 }
 
 .form-control {
-    background-color: transparent;
-    border: none;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     color: white;
+    padding: 12px 15px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
 }
 
 .form-control:focus {
     color: white;
-    background-color: transparent;
+    background: rgba(255, 255, 255, 0.1);
     outline: none;
-    border-color: transparent;
+    border-color: rgb(105, 244, 181);
+    box-shadow: 0 0 15px rgba(105, 244, 181, 0.2);
 }
 
 .divider-nospace {
-    border-top: 1px solid white;
+    display: none; /* Dùng border box thay vì line dưới */
 }
 
 .password-field {
@@ -42,11 +46,18 @@
 
 .password-toggle {
     position: absolute;
-    top: 50%;
-    right: 10px;
-    transform: translateY(-50%);
+    bottom: 12px; /* Căn chỉnh chính xác với input field bên dưới label */
+    right: 15px;
     color: rgb(105, 244, 181);
-    cursor: pointer
+    cursor: pointer;
+    z-index: 10;
+    font-size: 1.1rem;
+    transition: transform 0.2s ease;
+}
+
+.password-toggle:hover {
+    transform: scale(1.1);
+    filter: brightness(1.2);
 }
 
 .checkbox-text input[type="checkbox"]:checked {

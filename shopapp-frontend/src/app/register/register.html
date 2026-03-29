@@ -32,25 +32,25 @@
                     <div class="col-md-6">
                         <div class="form-group password-field">
                             <label for="password">Mật khẩu</label>
-                            <input type="password" placeholder="ít nhất 3 ký tự" class="form-control" id="password"
+                            <input [type]="showPassword() ? 'text' : 'password'" placeholder="ít nhất 3 ký tự" class="form-control" id="password"
                                 [ngModel]="password()" (ngModelChange)="password.set($event)"
                                 (input)="onPasswordChange()">
                             @if (passwordError()) {
                             <div class="text-danger-custom">{{ passwordError() }}</div>
                             }
-                            <i class="password-toggle fas fa-eye-slash"></i>
+                            <i [class]="showPassword() ? 'password-toggle fas fa-eye' : 'password-toggle fas fa-eye-slash'" (click)="showPassword.set(!showPassword())"></i>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-group password-field">
                             <label for="retype-password">Gõ lại mật khẩu</label>
-                            <input type="password" placeholder="Ít nhất 3 ký tự" class="form-control"
+                            <input [type]="showRetypePassword() ? 'text' : 'password'" placeholder="Ít nhất 3 ký tự" class="form-control"
                                 id="retype-password" [ngModel]="retypePassword()"
                                 (ngModelChange)="retypePassword.set($event)" (input)="onRetypePasswordChange()">
                             @if (retypePasswordError()) {
                             <div class="text-danger-custom">{{ retypePasswordError() }}</div>
                             }
-                            <i class="password-toggle fas fa-eye-slash"></i>
+                            <i [class]="showRetypePassword() ? 'password-toggle fas fa-eye' : 'password-toggle fas fa-eye-slash'" (click)="showRetypePassword.set(!showRetypePassword())"></i>
                         </div>
                     </div>
 

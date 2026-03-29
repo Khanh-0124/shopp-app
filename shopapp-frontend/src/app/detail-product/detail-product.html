@@ -1,6 +1,6 @@
 <app-header></app-header>
 <div class="container my-5 pt-4">
-  <div class="product-detail-glass p-4 p-md-5 rounded-4 shadow-lg mb-5" *ngIf="product(); else loading">
+  <div class="product-detail-glass p-4 p-md-5 rounded-4 shadow-lg mb-5" *ngIf="product()">
     <div class="row g-5">
       <!-- Product Images Section -->
       <div class="col-lg-6">
@@ -96,13 +96,5 @@
     </div>
   </div>
 
-  <ng-template #loading>
-    <div class="py-5 text-center">
-      <div class="spinner-border text-primary fs-3" role="status" style="width: 3rem; height: 3rem;">
-        <span class="visually-hidden">Loading...</span>
-      </div>
-      <h4 class="mt-4 text-muted">Đang tải thông tin sản phẩm...</h4>
-    </div>
-  </ng-template>
 </div>
 <app-footer></app-footer>

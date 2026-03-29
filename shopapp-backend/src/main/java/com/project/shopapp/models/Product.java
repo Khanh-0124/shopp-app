@@ -27,7 +27,7 @@ public class Product extends BaseEntity{
     @Column(name = "thumbnail", length = 300)
     private String thumbnail;
 
-    @Column(name = "description")
+    @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 
     @ManyToOne

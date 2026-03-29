@@ -15,6 +15,7 @@ export class LoginComponent {
   phoneNumber = signal<string>('');
   password = signal<string>('');
   roleId = signal<number>(1);
+  showPassword = signal<boolean>(false);
   
   private router = inject(Router);
   private userService = inject(UserService);

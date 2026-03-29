@@ -1,6 +1,6 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, of, tap } from 'rxjs';
 import { environment } from '../../environments/environment';
 
 @Injectable({
@@ -10,14 +10,31 @@ export class ProductService {
   private apiUrl = `${environment.apiBaseUrl}/products`;
   private http = inject(HttpClient);
 
+  // Cache state
+  private lastCacheKey = '';
+  private cachedData = signal<any>(null);
+
   getProducts(keyword: string, categoryId: number, page: number, limit: number): Observable<any> {
+    const cacheKey = `${keyword}-${categoryId}-${page}-${limit}`;
+    
+    // Nếu có cache và key không đổi, trả về cache ngay lập tức
+    if (this.cachedData() && this.lastCacheKey === cacheKey) {
+      return of(this.cachedData());
+    }
+
     let params = new HttpParams()
       .set('keyword', keyword)
       .set('category_id', categoryId.toString())
       .set('page', page.toString())
       .set('limit', limit.toString());
 
-    return this.http.get(this.apiUrl, { params });
+    return this.http.get(this.apiUrl, { params }).pipe(
+      tap(response => {
+        // Lưu vào cache
+        this.lastCacheKey = cacheKey;
+        this.cachedData.set(response);
+      })
+    );
   }
 
   getProductById(productId: number): Observable<any> {
