@@ -1,0 +1,105 @@
+<app-header></app-header>
+<div class="container">
+    <div class="row">
+        <div class="col-lg-8 offset-lg-2">
+            <div class="login-form mx-auto">
+                <h2 class="login-header">Đăng ký thành viên</h2>
+
+                <div class="row">
+                    <!-- Row 1: Phone & Full Name -->
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="phone">Số điện thoại</label>
+                            <input type="text" class="form-control" id="phone" [ngModel]="phone()"
+                                (ngModelChange)="phone.set($event)" (input)="onPhoneChange()">
+                            @if (phoneError()) {
+                            <div class="text-danger-custom">{{ phoneError() }}</div>
+                            }
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="full-name">Họ và tên</label>
+                            <input type="text" class="form-control" id="full-name" [ngModel]="fullName()"
+                                (ngModelChange)="fullName.set($event)" (input)="onFullNameChange()">
+                            @if (fullNameError()) {
+                            <div class="text-danger-custom">{{ fullNameError() }}</div>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Row 2: Password & Retype -->
+                    <div class="col-md-6">
+                        <div class="form-group password-field">
+                            <label for="password">Mật khẩu</label>
+                            <input type="password" placeholder="ít nhất 3 ký tự" class="form-control" id="password"
+                                [ngModel]="password()" (ngModelChange)="password.set($event)"
+                                (input)="onPasswordChange()">
+                            @if (passwordError()) {
+                            <div class="text-danger-custom">{{ passwordError() }}</div>
+                            }
+                            <i class="password-toggle fas fa-eye-slash"></i>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group password-field">
+                            <label for="retype-password">Gõ lại mật khẩu</label>
+                            <input type="password" placeholder="Ít nhất 3 ký tự" class="form-control"
+                                id="retype-password" [ngModel]="retypePassword()"
+                                (ngModelChange)="retypePassword.set($event)" (input)="onRetypePasswordChange()">
+                            @if (retypePasswordError()) {
+                            <div class="text-danger-custom">{{ retypePasswordError() }}</div>
+                            }
+                            <i class="password-toggle fas fa-eye-slash"></i>
+                        </div>
+                    </div>
+
+                    <!-- Row 3: DOB & Address -->
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="date-of-birth">Ngày tháng năm sinh</label>
+                            <input type="date" class="form-control" id="date-of-birth" [ngModel]="dateOfBirth()"
+                                (ngModelChange)="dateOfBirth.set($event)" (input)="onDateOfBirthChange()">
+                            @if (dateOfBirthError()) {
+                            <div class="text-danger-custom">{{ dateOfBirthError() }}</div>
+                            }
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="address">Địa chỉ</label>
+                            <input type="text" class="form-control" id="address" [ngModel]="address()"
+                                (ngModelChange)="address.set($event)" (input)="onAddressChange()">
+                            @if (addressError()) {
+                            <div class="text-danger-custom">{{ addressError() }}</div>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="form-check checkbox-text">
+                        <span style="display: flex;">
+                            <input [ngModel]="isAccepted()" (ngModelChange)="isAccepted.set($event)" type="checkbox"
+                                class="form-check-input" id="agree">
+                            <label class="form-check-label text-start" for="agree">
+                                Tôi đồng ý với các điều khoản và điều kiện</label>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 offset-md-3">
+                        <button type="button" (click)="register()" class="register-button">Đăng ký</button>
+                    </div>
+                </div>
+
+                <div class="divider"></div>
+                <p class="text-center">Bạn đã có tài khoản? <span (click)="navigateToLogin()" class="register-link">Đăng
+                        nhập</span>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+<app-footer></app-footer>

@@ -1,0 +1,35 @@
+.product-detail-glass {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.thumbnail-scroll::-webkit-scrollbar {
+  height: 6px;
+}
+.thumbnail-scroll::-webkit-scrollbar-track {
+  background: transparent; 
+}
+.thumbnail-scroll::-webkit-scrollbar-thumb {
+  background: rgba(99, 102, 241, 0.3); 
+  border-radius: 10px;
+}
+.thumbnail-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(99, 102, 241, 0.8); 
+}
+
+.cursor-pointer {
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    transform: scale(1.05);
+  }
+}
+
+.main-image-container img {
+  transition: transform 0.4s ease;
+  &:hover {
+    transform: scale(1.1);
+  }
+}

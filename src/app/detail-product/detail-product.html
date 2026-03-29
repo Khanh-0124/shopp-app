@@ -1,0 +1,108 @@
+<app-header></app-header>
+<div class="container my-5 pt-4">
+  <div class="product-detail-glass p-4 p-md-5 rounded-4 shadow-lg mb-5" *ngIf="product(); else loading">
+    <div class="row g-5">
+      <!-- Product Images Section -->
+      <div class="col-lg-6">
+        <div class="main-image-container rounded-4 overflow-hidden mb-3 shadow-sm border border-white border-opacity-25" style="aspect-ratio: 1; background: #fff;">
+          <img [src]="getImageUrl(getProductImages()[currentImageIndex()])" 
+               class="w-100 h-100 object-fit-contain" 
+               alt="{{ product().name }}"
+               (error)="$event.target.src='https://via.placeholder.com/800x800?text=Invalid+Image+Link'">
+        </div>
+        
+        <!-- Thumbnails -->
+        <div class="d-flex gap-3 overflow-auto pb-2 thumbnail-scroll">
+          @for (img of getProductImages(); track img; let i = $index) {
+          <div class="thumbnail-item rounded-3 overflow-hidden border cursor-pointer" 
+               [ngClass]="i === currentImageIndex() ? 'border-primary border-2 shadow-sm' : 'border-secondary border-opacity-25'"
+               (click)="setCurrentImage(i)"
+               style="width: 80px; height: 80px; flex-shrink: 0; background: #fff;">
+            <img [src]="getImageUrl(img)" class="w-100 h-100 object-fit-cover" alt="thumbnail"
+                 (error)="$event.target.src='https://via.placeholder.com/150x150?text=Invalid'">
+          </div>
+          }
+        </div>
+      </div>
+
+      <!-- Product Info Section -->
+      <div class="col-lg-6 d-flex flex-column">
+        <nav aria-label="breadcrumb" class="mb-3">
+          <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a routerLink="/home" class="text-decoration-none text-muted">Trang chủ</a></li>
+            <li class="breadcrumb-item"><a href="#" class="text-decoration-none text-muted">Danh mục {{ product().category_id }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Chi tiết</li>
+          </ol>
+        </nav>
+
+        <h1 class="display-5 fw-bold mb-3 text-dark">{{ product().name }}</h1>
+        <div class="d-flex align-items-center mb-4 gap-3">
+          <div class="rating text-warning fs-5">
+            <i class="fa-solid fa-star"></i>
+            <i class="fa-solid fa-star"></i>
+            <i class="fa-solid fa-star"></i>
+            <i class="fa-solid fa-star"></i>
+            <i class="fa-solid fa-star-half-stroke"></i>
+          </div>
+          <span class="text-muted">(Đánh giá tích cực)</span>
+        </div>
+
+        <div class="price-box p-4 rounded-4 mb-4 text-white" style="background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);">
+          <h2 class="display-4 fw-bold mb-0">{{ product().price | currency:'VND':'symbol':'1.0-0' }}</h2>
+        </div>
+
+        <div class="mb-5 flex-grow-1">
+          <h5 class="fw-bold mb-3">Mô tả sản phẩm</h5>
+          <p class="text-secondary lh-lg fs-5">
+            {{ product().description || 'Chưa có thông tin mô tả chi tiết cho sản phẩm này. Hãy liên hệ bộ phận hỗ trợ nếu cần thêm chi tiết.' }}
+          </p>
+        </div>
+
+        <hr class="mb-4 opacity-10">
+
+        <!-- Action Area -->
+        <div class="d-flex align-items-end gap-4 mt-auto">
+          <!-- Quantity Control -->
+          <div class="quantity-control">
+            <label class="form-label text-muted fw-bold small text-uppercase mb-2 d-block">Số lượng</label>
+            <div class="input-group input-group-lg rounded-pill p-1 border shadow-sm bg-white" style="width: 150px;">
+              <button class="btn btn-light rounded-circle border-0 d-flex align-items-center justify-content-center" 
+                      style="width: 40px; height: 40px;" (click)="decreaseQuantity()">
+                <i class="fa-solid fa-minus"></i>
+              </button>
+              <input type="text" class="form-control border-0 text-center fw-bold bg-transparent mx-1" 
+                     [ngModel]="quantity()" readonly style="min-width: 40px;">
+              <button class="btn btn-light rounded-circle border-0 d-flex align-items-center justify-content-center" 
+                      style="width: 40px; height: 40px;" (click)="increaseQuantity()">
+                <i class="fa-solid fa-plus"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Add to Cart / Buy Now -->
+          <div class="flex-grow-1 d-flex gap-3">
+            <button class="btn btn-outline-primary btn-lg rounded-pill flex-grow-1 fw-bold fs-5 px-4 shadow-sm"
+                    (click)="addToCart()" style="border-width: 2px;">
+              <i class="fa-solid fa-cart-plus me-2"></i> Thêm hàng
+            </button>
+            <button class="btn btn-primary btn-lg rounded-pill flex-grow-1 fw-bold fs-5 px-4 shadow-sm"
+                    (click)="buyNow()" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); border: none;">
+              Mua ngay <i class="fa-solid fa-arrow-right ms-2"></i>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <ng-template #loading>
+    <div class="py-5 text-center">
+      <div class="spinner-border text-primary fs-3" role="status" style="width: 3rem; height: 3rem;">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <h4 class="mt-4 text-muted">Đang tải thông tin sản phẩm...</h4>
+    </div>
+  </ng-template>
+</div>
+<app-footer></app-footer>
