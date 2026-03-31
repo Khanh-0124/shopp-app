@@ -49,7 +49,7 @@ public class ProductService implements IProductService{
                 .build();
         Product savedProduct = productRepository.save(newProduct);
         
-        if (productDTO.getHasVariants()) {
+        if (Boolean.TRUE.equals(productDTO.getHasVariants())) {
             saveVariants(savedProduct, productDTO);
         }
         
@@ -112,7 +112,7 @@ public class ProductService implements IProductService{
     public ProductResponse getProductResponseById(long productId) throws Exception {
         Product product = getProductById(productId);
         ProductResponse response = ProductResponse.fromProduct(product);
-        if (product.getHasVariants()) {
+        if (Boolean.TRUE.equals(product.getHasVariants())) {
             response.setAttributes(mapAttributes(productId));
             response.setVariants(mapVariants(productId));
         }
@@ -131,7 +131,7 @@ public class ProductService implements IProductService{
         productsPage = productRepository.searchProducts(categoryId, keyword, pageRequest);
         return productsPage.map(product -> {
             ProductResponse response = ProductResponse.fromProduct(product);
-            if (product.getHasVariants()) {
+            if (Boolean.TRUE.equals(product.getHasVariants())) {
                 // Map variants to response
                 response.setAttributes(mapAttributes(product.getId()));
                 response.setVariants(mapVariants(product.getId()));
@@ -182,13 +182,13 @@ public class ProductService implements IProductService{
             existingProduct.setHasVariants(productDTO.getHasVariants());
             
             // Handle variants update: Delete old and save new (Simple approach)
-            if (existingProduct.getHasVariants()) {
+            if (Boolean.TRUE.equals(existingProduct.getHasVariants())) {
                 variantRepository.deleteByProductId(id);
                 attributeRepository.deleteByProductId(id);
             }
             
             Product savedProduct = productRepository.save(existingProduct);
-            if (productDTO.getHasVariants()) {
+            if (Boolean.TRUE.equals(productDTO.getHasVariants())) {
                 saveVariants(savedProduct, productDTO);
             }
             return savedProduct;
