@@ -1,6 +1,7 @@
 import { Component, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { LoadingComponent } from './loading/loading';
+import { ToastComponent } from './shared/toast/toast';
 
 @Component({
   selector: 'app-root',
@@ -8,9 +9,11 @@ import { LoadingComponent } from './loading/loading';
   imports: [
     RouterOutlet,
     LoadingComponent,
+    ToastComponent,
   ],
   template: `
     <app-loading></app-loading>
+    <app-toast></app-toast>
     <router-outlet></router-outlet>
     
     <!-- Floating Contact Buttons -->

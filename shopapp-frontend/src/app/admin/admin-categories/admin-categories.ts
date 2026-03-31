@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CategoryService } from '../../service/category.service';
 import { UserService } from '../../service/user.service';
+import { ToastService } from '../../service/toast.service';
 
 @Component({
   selector: 'app-admin-categories',
@@ -90,7 +91,7 @@ export class AdminCategoriesComponent implements OnInit {
   showModal = signal<boolean>(false);
   modalTitle = signal<string>('Thêm Danh Mục');
   isEdit = signal<boolean>(false);
-  
+
   categoryForm = {
     id: 0,
     name: ''
@@ -98,6 +99,7 @@ export class AdminCategoriesComponent implements OnInit {
 
   private categoryService = inject(CategoryService);
   private userService = inject(UserService);
+  private toastService = inject(ToastService);
 
   ngOnInit() {
     this.loadCategories();
@@ -136,29 +138,34 @@ export class AdminCategoriesComponent implements OnInit {
     if (this.isEdit()) {
       this.categoryService.updateCategory(this.categoryForm.id, dto, token).subscribe({
         next: () => {
+          this.toastService.success('Cập nhật danh mục thành công');
           this.closeModal();
           this.loadCategories();
         },
-        error: (err) => alert('Lỗi: ' + (err.error || err.message))
+        error: (err) => this.toastService.error('Lỗi: ' + (err.error || err.message))
       });
     } else {
       this.categoryService.createCategory(dto, token).subscribe({
         next: () => {
+          this.toastService.success('Thêm danh mục thành công');
           this.closeModal();
           this.loadCategories();
         },
-        error: (err) => alert('Lỗi: ' + (err.error || err.message))
+        error: (err) => this.toastService.error('Lỗi: ' + (err.error || err.message))
       });
     }
   }
 
   deleteCategory(id: number) {
-    if (confirm('Xóa danh mục này?')) {
+    if (confirm('Bạn có chắc chắn muốn xóa danh mục này?')) {
       const token = this.userService.getToken();
       if (!token) return;
       this.categoryService.deleteCategory(id, token).subscribe({
-        next: () => this.loadCategories(),
-        error: (err) => alert('Lỗi: ' + (err.error || err.message))
+        next: () => {
+          this.toastService.success('Xóa danh mục thành công');
+          this.loadCategories();
+        },
+        error: (err) => this.toastService.error('Lỗi xóa danh mục: ' + (err.error || err.message))
       });
     }
   }

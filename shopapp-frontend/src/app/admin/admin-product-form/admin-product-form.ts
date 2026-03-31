@@ -5,6 +5,7 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { ProductService } from '../../service/product.service';
 import { UserService } from '../../service/user.service';
 import { CategoryService } from '../../service/category.service';
+import { ToastService } from '../../service/toast.service';
 import { environment } from '../../../environments/environment';
 
 @Component({
@@ -297,6 +298,7 @@ export class AdminProductFormComponent implements OnInit {
 
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private toastService = inject(ToastService);
   private productService = inject(ProductService);
   private userService = inject(UserService);
   private categoryService = inject(CategoryService);
@@ -435,6 +437,7 @@ export class AdminProductFormComponent implements OnInit {
         error: (err) => {
           this.existingImages = originalImages;
           alert('Lỗi: ' + (err.error || err.message));
+          this.toastService.error('Lỗi: ' + (err.error || err.message));
         }
       });
     }
@@ -450,7 +453,7 @@ export class AdminProductFormComponent implements OnInit {
   loadCategories() {
     this.categoryService.getCategories().subscribe({
       next: (res) => this.categories.set(res),
-      error: (err) => alert('Lỗi tải danh mục: ' + err.message)
+      error: (err) => this.toastService.error('Lỗi tải danh mục: ' + err.message)
     });
   }
 
@@ -475,13 +478,13 @@ export class AdminProductFormComponent implements OnInit {
         if (res.attributes) this.attributeGroups = res.attributes;
         if (res.variants) this.productVariants = res.variants;
       },
-      error: (err) => alert('Lỗi tải sản phẩm: ' + err.message)
+      error: (err) => this.toastService.error('Lỗi tải sản phẩm: ' + err.message)
     });
   }
 
   saveProduct(form: any) {
     if (form.invalid) {
-      alert('Vui lòng điền đầy đủ các trường bắt buộc!');
+      this.toastService.warning('Vui lòng điền đầy đủ các trường bắt buộc!');
       return;
     }
 
@@ -501,12 +504,12 @@ export class AdminProductFormComponent implements OnInit {
     if (this.isEditMode()) {
       this.productService.updateProduct(this.productId(), payload, token).subscribe({
         next: (res) => this.uploadImages(this.productId(), token),
-        error: (err) => alert('Lỗi cập nhật: ' + (err.error || err.message))
+        error: (err) => this.toastService.error('Lỗi cập nhật: ' + (err.error || err.message))
       });
     } else {
       this.productService.createProduct(payload, token).subscribe({
         next: (res) => this.uploadImages(res.id, token),
-        error: (err) => alert('Lỗi khi tạo: ' + (err.error || err.message))
+        error: (err) => this.toastService.error('Lỗi khi tạo: ' + (err.error || err.message))
       });
     }
   }
@@ -515,7 +518,6 @@ export class AdminProductFormComponent implements OnInit {
     if (this.selectedFiles.length > 0) {
       this.productService.uploadImages(productId, this.selectedFiles, token).subscribe({
         next: () => {
-          alert('Lưu sản phẩm thành công!');
           this.goBack();
         },
         error: (err) => {
@@ -524,7 +526,6 @@ export class AdminProductFormComponent implements OnInit {
         }
       });
     } else {
-      alert('Lưu sản phẩm thành công!');
       this.goBack();
     }
   }

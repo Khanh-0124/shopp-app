@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { HeaderComponent } from "../header/header";
 import { FooterComponent } from "../footer/footer";
 import { UserService } from '../service/user.service';
+import { ToastService } from '../service/toast.service';
 
 @Component({
   selector: 'app-login',
@@ -19,6 +20,7 @@ export class LoginComponent {
   
   private router = inject(Router);
   private userService = inject(UserService);
+  private toastService = inject(ToastService);
 
   login() {
     const loginData = {

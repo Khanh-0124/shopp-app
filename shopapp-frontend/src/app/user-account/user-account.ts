@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { HeaderComponent } from '../header/header';
 import { FooterComponent } from '../footer/footer';
 import { UserService } from '../service/user.service';
+import { ToastService } from '../service/toast.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -202,6 +203,7 @@ export class UserAccountComponent implements OnInit {
   };
 
   private userService = inject(UserService);
+  private toastService = inject(ToastService);
   private router = inject(Router);
 
   ngOnInit() {

@@ -6,6 +6,7 @@ import { HeaderComponent } from "../header/header";
 import { FooterComponent } from "../footer/footer";
 import { ProductService } from '../service/product.service';
 import { OrderListService } from '../service/order-list.service';
+import { ToastService } from '../service/toast.service';
 
 @Component({
   selector: 'app-detail-product',
@@ -27,6 +28,7 @@ export class DetailProductComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private productService = inject(ProductService);
+  private toastService = inject(ToastService);
   private orderListService = inject(OrderListService);
 
   ngOnInit() {
@@ -128,7 +130,7 @@ export class DetailProductComponent implements OnInit {
     if (!product) return;
 
     if (product.has_variants && !this.selectedVariant()) {
-      alert('Vui lòng chọn đầy đủ phân loại (Màu sắc, Size...) trước khi mua!');
+      this.toastService.warning('Vui lòng chọn đầy đủ phân loại (Màu sắc, Size...) trước khi mua!');
       return;
     }
 
@@ -142,13 +144,13 @@ export class DetailProductComponent implements OnInit {
     };
 
     this.orderListService.addToOrder(itemToOrder, this.quantity());
-    alert(`Đã thêm ${this.quantity()} sản phẩm vào đơn hàng!`);
+    this.toastService.success(`Đã thêm ${this.quantity()} sản phẩm vào đơn hàng!`);
   }
   
   buyNow() {
     const product = this.product();
     if (product.has_variants && !this.selectedVariant()) {
-      alert('Vui lòng chọn đầy đủ phân loại (Màu sắc, Size...)!');
+      this.toastService.warning('Vui lòng chọn đầy đủ phân loại (Màu sắc, Size...)!');
       return;
     }
     this.addToCart();

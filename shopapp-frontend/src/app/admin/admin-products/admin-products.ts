@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { ProductService } from '../../service/product.service';
 import { UserService } from '../../service/user.service';
+import { ToastService } from '../../service/toast.service';
 import { environment } from '../../../environments/environment';
 
 @Component({
@@ -10,6 +11,32 @@ import { environment } from '../../../environments/environment';
   standalone: true,
   imports: [CommonModule, RouterModule],
   template: `
+    <!-- Custom Confirm Modal -->
+    @if (showModal) {
+      <div class="modal fade show" style="display: block; background: rgba(0,0,0,0.5); z-index: 9999;">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
+            <div class="modal-body p-5 text-center">
+              <div class="mb-4">
+                <i class="fa-solid fa-circle-exclamation text-warning" style="font-size: 4rem;"></i>
+              </div>
+              <h4 class="fw-bold mb-3">Xác nhận thao tác</h4>
+              <p class="text-secondary mb-4">
+                {{ isDeleteAll ? 'CẢNH BÁO: Bạn có chắc chắn muốn xóa TẤT CẢ sản phẩm không? Hành động này không thể hoàn tác!' : 'Bạn có chắc chắn muốn xóa sản phẩm này không?' }}
+              </p>
+              <div class="d-flex gap-3 justify-content-center">
+                <button class="btn btn-light rounded-pill px-4 py-2 fw-bold" (click)="closeModal()">Hủy bỏ</button>
+                <button class="btn btn-danger rounded-pill px-4 py-2 fw-bold shadow-sm" (click)="confirmAction()">
+                  <i class="fa-solid fa-trash-can me-2"></i>Chắc chắn xóa
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+
+    <div class="container-fluid py-5 bg-light min-vh-100">
     <div class="card border-0 shadow-sm rounded-4 overflow-hidden" style="background: white;">
       <div class="card-header bg-white border-bottom p-4 d-flex justify-content-between align-items-center">
         <h4 class="mb-0 fw-bold">Danh sách Sản phẩm</h4>
@@ -49,10 +76,10 @@ import { environment } from '../../../environments/environment';
                 <td class="fw-bold text-primary">{{ product.price | currency:'VND':'symbol':'1.0-0' }}</td>
                 <td class="text-end pe-4">
                   <div class="btn-group shadow-sm rounded-pill">
-                    <button class="btn btn-light text-primary py-2 px-3 border-secondary border-opacity-25" (click)="editProduct(product.id)" title="Chỉnh sửa">
+                    <button class="btn btn-light text-primary py-2 px-3 border-secondary border-opacity-25" (click)="$event.stopPropagation(); editProduct(product.id)" title="Chỉnh sửa">
                       <i class="fa-solid fa-pen-to-square"></i>
                     </button>
-                    <button class="btn btn-light text-danger py-2 px-3 border-secondary border-opacity-25" (click)="deleteProduct(product.id)" title="Xóa">
+                    <button class="btn btn-light text-danger py-2 px-3 border-secondary border-opacity-25" (click)="$event.stopPropagation(); deleteProduct(product.id)" title="Xóa">
                       <i class="fa-solid fa-trash-can"></i>
                     </button>
                   </div>
@@ -83,13 +110,11 @@ import { environment } from '../../../environments/environment';
         </nav>
       </div>
     </div>
+    </div>
   `,
   styles: [`
     tr:hover {
-      background-color: #f3f4f6 !important;
-      transform: scale(1.01);
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-      z-index: 10;
+      background-color: #f8f9fa !important;
       position: relative;
     }
   `]
@@ -98,22 +123,31 @@ export class AdminProductsComponent implements OnInit {
   products = signal<any[]>([]);
   totalPages = signal<number>(0);
   currentPage = signal<number>(0);
+  isDeleting = false;
+  
+  // Modal state
+  showModal = false;
+  productIdToDelete: number | null = null;
+  isDeleteAll = false;
 
   private productService = inject(ProductService);
   private userService = inject(UserService);
   private router = inject(Router);
+  private toastService = inject(ToastService);
 
   ngOnInit() {
     this.getProducts();
   }
 
   getProducts() {
+    console.log(`[DEBUG] getProducts called for page: ${this.currentPage()}`);
     this.productService.getProducts('', 0, this.currentPage(), 10).subscribe({
       next: (response) => {
+        console.log('[DEBUG] getProducts success:', response.products.length, 'items');
         this.products.set(response.products);
         this.totalPages.set(response.totalPages);
       },
-      error: (err) => console.error(err)
+      error: (err) => console.error('[DEBUG] getProducts error:', err)
     });
   }
 
@@ -139,34 +173,55 @@ export class AdminProductsComponent implements OnInit {
   }
 
   deleteProduct(id: number) {
-    if (confirm('Bạn có chắc chắn muốn xóa sản phẩm này không?')) {
-      const token = this.userService.getToken();
-      if (token) {
-         this.productService.deleteProduct(id, token).subscribe({
-           next: () => {
-             alert('Xóa thành công!');
-             this.getProducts();
-           },
-           error: (err) => alert('Lỗi: ' + (err.error || err.message))
-         });
-      } else {
-         alert("Yêu cầu đăng nhập");
-      }
-    }
+    console.log(`[DEBUG] deleteProduct triggered for ID: ${id}`);
+    this.productIdToDelete = id;
+    this.isDeleteAll = false;
+    this.showModal = true;
   }
 
   deleteAll() {
-    if (confirm('CẢNH BÁO: Bạn có chắc chắn muốn xóa TẤT CẢ sản phẩm không? Hành động này không thể hoàn tác!')) {
-      const token = this.userService.getToken();
-      if (token) {
-        this.productService.deleteAllProducts(token).subscribe({
-          next: () => {
-            alert('Đã xóa tất cả sản phẩm thành công!');
-            this.getProducts();
-          },
-          error: (err) => alert('Lỗi: ' + (err.error || err.message))
-        });
-      }
+    console.log('[DEBUG] deleteAll triggered');
+    this.isDeleteAll = true;
+    this.productIdToDelete = null;
+    this.showModal = true;
+  }
+
+  closeModal() {
+    this.showModal = false;
+    this.productIdToDelete = null;
+    this.isDeleteAll = false;
+  }
+
+  confirmAction() {
+    console.log('[DEBUG] confirmAction clicked in custom modal');
+    this.showModal = false;
+    const token = this.userService.getToken();
+    if (!token) {
+      this.toastService.warning("Vui lòng đăng nhập để thực hiện thao tác");
+      return;
+    }
+
+    if (this.isDeleteAll) {
+      this.productService.deleteAllProducts(token).subscribe({
+        next: () => {
+          this.toastService.success('Đã xóa toàn bộ sản phẩm');
+          this.getProducts();
+        },
+        error: (err) => this.toastService.error('Lỗi: ' + (err.error || err.message))
+      });
+    } else if (this.productIdToDelete !== null) {
+      this.isDeleting = true;
+      this.productService.deleteProduct(this.productIdToDelete, token).subscribe({
+        next: () => {
+          this.isDeleting = false;
+          this.toastService.success('Xóa sản phẩm thành công');
+          this.getProducts();
+        },
+        error: (err) => {
+          this.isDeleting = false;
+          this.toastService.error('Lỗi: ' + (err.error || err.message));
+        }
+      });
     }
   }
 }
