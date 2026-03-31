@@ -15,6 +15,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.web.access.channel.ChannelProcessingFilter;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
@@ -110,24 +111,22 @@ public class WebSecurityConfig {
 
 
                             .anyRequest().authenticated();
-                            //.anyRequest().permitAll();
-
                 })
-                .csrf(AbstractHttpConfigurer::disable);
-        http.cors(new Customizer<CorsConfigurer<HttpSecurity>>() {
-            @Override
-            public void customize(CorsConfigurer<HttpSecurity> httpSecurityCorsConfigurer) {
-                CorsConfiguration configuration = new CorsConfiguration();
-                configuration.setAllowedOrigins(List.of("*"));
-                configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
-                configuration.setAllowedHeaders(Arrays.asList("authorization", "content-type", "x-auth-token"));
-                configuration.setExposedHeaders(List.of("x-auth-token"));
-                UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-                source.registerCorsConfiguration("/**", configuration);
-                httpSecurityCorsConfigurer.configurationSource(source);
-            }
-        });
+                .csrf(AbstractHttpConfigurer::disable)
+                .cors(Customizer.withDefaults());
 
         return http.build();
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(List.of("*"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(Arrays.asList("authorization", "content-type", "x-auth-token"));
+        configuration.setExposedHeaders(List.of("x-auth-token"));
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 }
