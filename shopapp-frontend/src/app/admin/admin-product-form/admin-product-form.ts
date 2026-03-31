@@ -111,6 +111,15 @@ import { CategoryService } from '../../service/category.service';
                         </div>
                     </div>
                 </div>
+                <table class="table table-hover align-middle mb-0 text-center">
+                  <thead class="bg-light">
+                    <tr>
+                      <th class="py-3 px-4" *ngFor="let group of attributeGroups">{{ group.name || 'Phân loại' }}</th>
+                      <th class="py-3 px-4" style="width: 200px;">Giá bán (₫)</th>
+                      <th class="py-3 px-4" style="width: 150px;">Kho hàng</th>
+                      <th class="py-3 px-4">SKU</th>
+                    </tr>
+                  </thead>
                   <tbody>
                     <tr *ngFor="let variant of productVariants; let v = index">
                       <td class="fw-bold text-primary px-4" *ngFor="let comboVal of variant.combination">{{ comboVal }}</td>
