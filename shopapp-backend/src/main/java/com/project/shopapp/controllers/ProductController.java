@@ -68,6 +68,7 @@ public class ProductController {
                             .price(newProduct.getPrice())
                             .description(newProduct.getDescription())
                             .thumbnail(newProduct.getThumbnail())
+                            .hasVariants(Boolean.TRUE.equals(newProduct.getHasVariants()))
                             .categoryId(newProduct.getCategory().getId())
                             .build());
                 }
@@ -112,6 +113,7 @@ public class ProductController {
                         .price(existingProduct.getPrice())
                         .description(existingProduct.getDescription())
                         .thumbnail(existingProduct.getThumbnail())
+                        .hasVariants(Boolean.TRUE.equals(existingProduct.getHasVariants()))
                         .categoryId(existingProduct.getCategory().getId())
                         .build());
             }
