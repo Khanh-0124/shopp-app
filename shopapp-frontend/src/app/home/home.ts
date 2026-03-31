@@ -2,6 +2,7 @@ import { Component, OnInit, inject, signal, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
+import { environment } from '../../environments/environment';
 import { HeaderComponent } from '../header/header';
 import { FooterComponent } from '../footer/footer';
 import { ProductService } from '../service/product.service';
@@ -78,6 +79,6 @@ export class Home implements OnInit {
   getImageUrl(thumbnail: string | null): string {
     if (!thumbnail || thumbnail === "") return 'https://via.placeholder.com/300x300?text=No+Image';
     if (thumbnail.startsWith('http://') || thumbnail.startsWith('https://')) return thumbnail;
-    return `http://localhost:8088/api/v1/products/images/${thumbnail}`;
+    return `${environment.apiBaseUrl}/products/images/${thumbnail}`;
   }
 }

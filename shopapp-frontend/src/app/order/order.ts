@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { HeaderComponent } from '../header/header';
 import { FooterComponent } from '../footer/footer';
 import { OrderListService } from '../service/order-list.service';
+import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-order',
@@ -28,6 +29,6 @@ export class OrderComponent {
   getImageUrl(imageName: string | null): string {
     if (!imageName || imageName === "") return 'https://via.placeholder.com/150x150?text=No+Image';
     if (imageName.startsWith('http://') || imageName.startsWith('https://')) return imageName;
-    return `http://localhost:8088/api/v1/products/images/${imageName}`;
+    return `${environment.apiBaseUrl}/products/images/${imageName}`;
   }
 }

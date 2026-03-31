@@ -5,6 +5,7 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { ProductService } from '../../service/product.service';
 import { UserService } from '../../service/user.service';
 import { CategoryService } from '../../service/category.service';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-admin-product-form',
@@ -166,9 +167,10 @@ import { CategoryService } from '../../service/category.service';
                             [(ngModel)]="productData.price" name="price" 
                             [required]="productVariants.length === 0" 
                             [readonly]="productVariants.length > 0"
-                            min="0" #price="ngModel"
+                            min="1000" #price="ngModel"
                             [class.is-invalid]="price.invalid && price.touched"
                             placeholder="0">
+                        <div class="invalid-feedback" *ngIf="price.invalid && price.touched">Giá bán phải từ 1,000₫ trở lên.</div>
                     </div>
                 </div>
             </div>
@@ -241,7 +243,10 @@ import { CategoryService } from '../../service/category.service';
           <div class="col-12 mt-5">
             <h5 class="fw-bold mb-3 text-dark"><i class="fa-solid fa-file-lines me-2 text-primary"></i>Mô tả chi tiết</h5>
             <textarea class="form-control bg-light border-0 shadow-sm rounded-4 p-4" rows="6"
-                      [(ngModel)]="productData.description" name="description" placeholder="Viết mô tả chi tiết sản phẩm của bạn..."></textarea>
+                      [(ngModel)]="productData.description" name="description" 
+                      required #desc="ngModel" [class.is-invalid]="desc.invalid && desc.touched"
+                      placeholder="Viết mô tả chi tiết sản phẩm của bạn..."></textarea>
+            <div class="invalid-feedback" *ngIf="desc.invalid && desc.touched">Vui lòng nhập mô tả sản phẩm.</div>
           </div>
 
           <div class="col-12 text-end mt-5 pt-4 border-top">
@@ -438,7 +443,8 @@ export class AdminProductFormComponent implements OnInit {
   getImageUrl(thumbnail: string | null): string {
     if (!thumbnail || thumbnail === "") return 'https://via.placeholder.com/150x150?text=No+Image';
     if (thumbnail.startsWith('http://') || thumbnail.startsWith('https://')) return thumbnail;
-    return `http://localhost:8088/api/v1/products/images/${thumbnail}`;
+    if (thumbnail.startsWith('http://') || thumbnail.startsWith('https://')) return thumbnail;
+    return `${environment.apiBaseUrl}/products/images/${thumbnail}`;
   }
 
   loadCategories() {

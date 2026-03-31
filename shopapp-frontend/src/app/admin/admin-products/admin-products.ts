@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { ProductService } from '../../service/product.service';
 import { UserService } from '../../service/user.service';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-admin-products',
@@ -119,7 +120,7 @@ export class AdminProductsComponent implements OnInit {
   getImageUrl(thumbnail: string | null): string {
     if (!thumbnail || thumbnail === "") return 'https://via.placeholder.com/150x150?text=No+Image';
     if (thumbnail.startsWith('http://') || thumbnail.startsWith('https://')) return thumbnail;
-    return `http://localhost:8088/api/v1/products/images/${thumbnail}`;
+    return `${environment.apiBaseUrl}/products/images/${thumbnail}`;
   }
 
   onPageChange(page: number) {

@@ -3,6 +3,7 @@ import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Subject, debounceTime, distinctUntilChanged, switchMap, of } from 'rxjs';
+import { environment } from '../../environments/environment';
 import { UserService } from '../service/user.service';
 import { OrderListService } from '../service/order-list.service';
 import { ProductService } from '../service/product.service';
@@ -84,9 +85,9 @@ export class HeaderComponent implements OnInit {
     return url.includes('category_id=');
   }
 
-  getImageUrl(thumbnail: string | null): string {
-    if (!thumbnail || thumbnail === "") return 'https://via.placeholder.com/300x300?text=No+Image';
-    if (thumbnail.startsWith('http://') || thumbnail.startsWith('https://')) return thumbnail;
-    return `http://localhost:8088/api/v1/products/images/${thumbnail}`;
+  getImageUrl(avatarName: string | null): string {
+    if (!avatarName || avatarName === "") return 'https://via.placeholder.com/300x300?text=No+Image';
+    if (avatarName.startsWith('http://') || avatarName.startsWith('https://')) return avatarName;
+    return `${environment.apiBaseUrl}/products/images/${avatarName}`;
   }
 }
