@@ -11,22 +11,62 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarContent">
                 <ul class="navbar-nav ms-auto mb-2 mb-lg-0 gap-lg-4 align-items-center">
-                    <li class="nav-item">
+                    <li class="nav-item position-relative">
                         <div class="search-box-header d-flex align-items-center bg-white bg-opacity-10 border border-white border-opacity-25 rounded-pill px-3 py-1 shadow-sm">
                             <i class="fa-solid fa-magnifying-glass text-white opacity-50 small me-2"></i>
                             <input type="text" class="form-control form-control-sm border-0 bg-transparent text-white shadow-none ps-0" 
-                                   placeholder="Tìm sản phẩm..." style="width: 150px; font-size: 0.85rem;"
-                                   [ngModel]="keyword()" (ngModelChange)="keyword.set($event)" (keyup.enter)="onSearch()">
+                                   placeholder="Tìm sản phẩm..." style="width: 180px; font-size: 0.85rem;"
+                                   [ngModel]="keyword()" (ngModelChange)="onKeywordChange($event)" (keyup.enter)="onSearch()"
+                                   (blur)="searchSuggestions.set([])">
+                        </div>
+                        <!-- Search Suggestions Dropdown -->
+                        <div *ngIf="searchSuggestions().length > 0" 
+                             class="position-absolute bg-white rounded-3 shadow-lg mt-2 w-100 overflow-hidden" 
+                             style="top: 100%; z-index: 1050; border: 1px solid rgba(0,0,0,0.1);">
+                            <div *ngFor="let product of searchSuggestions()" 
+                                 (mousedown)="selectSuggestion(product)"
+                                 class="p-2 border-bottom hover-bg-light cursor-pointer d-flex align-items-center gap-2">
+                                <img [src]="getImageUrl(product.thumbnail)" 
+                                     style="width: 30px; height: 30px; object-fit: cover;" class="rounded shadow-sm">
+                                <div class="text-dark small text-truncate">{{ product.name }}</div>
+                            </div>
                         </div>
                     </li>
-                    <li class="nav-item"><a class="nav-link active" routerLink="/home">Trang chủ</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Sản phẩm</a></li>
+                    <!-- Dropdown Phân loại -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="categoryDropdown" role="button" 
+                           data-bs-toggle="dropdown" aria-expanded="false" [class.active]="isCategoryActive()">
+                            Phân loại
+                            <span class="nav-link-indicator"></span>
+                        </a>
+                        <ul class="dropdown-menu shadow-lg border-0 rounded-3 mt-2" aria-labelledby="categoryDropdown">
+                            <li><a class="dropdown-item" routerLink="/home" [queryParams]="{category_id: 0}" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Tất cả sản phẩm</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li *ngFor="let cat of categories()">
+                                <a class="dropdown-item" routerLink="/home" [queryParams]="{category_id: cat.id}" routerLinkActive="active">
+                                    {{ cat.name }}
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link position-relative" routerLink="/order" routerLinkActive="active">
+                            Đơn hàng
+                            <span *ngIf="totalOrderItems() > 0" class="position-absolute translate-middle badge rounded-pill bg-danger" 
+                                  style="top: 0; left: 100%; font-size: 0.65rem;">
+                                {{ totalOrderItems() }}
+                            </span>
+                            <span class="nav-link-indicator"></span>
+                        </a>
+                    </li>
                     @if (isAdmin) {
-                        <li class="nav-item"><a class="nav-link text-warning fw-bold" routerLink="/admin">Trang Quản Trị</a></li>
+                        <li class="nav-item"><a class="nav-link text-warning fw-bold" routerLink="/admin" routerLinkActive="active">Trang Quản Trị<span class="nav-link-indicator"></span></a></li>
                     }
                     <li class="nav-item">
                         <a class="nav-link align-items-center d-flex gap-2" (click)="navigateToProfile()" style="cursor: pointer;">
                             <i class="fa-solid fa-user fs-4"></i>
+                            <span class="nav-link-indicator"></span>
                         </a>
                     </li>
                 </ul>

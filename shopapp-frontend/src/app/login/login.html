@@ -5,31 +5,24 @@
             <div class="login-form mx-auto">
                 <h2 class="login-header">Đăng nhập</h2>
                 <div class="form-group">
-                    <label for="email">Email/Phone</label>
-                    <input type="text" class="form-control" id="email" [ngModel]="phoneNumber()" (ngModelChange)="phoneNumber.set($event)">
+                    <label for="email">Email / Số điện thoại</label>
+                    <input type="text" class="form-control" id="email" 
+                        placeholder="Nhập email hoặc số điện thoại"
+                        [ngModel]="phoneNumber()" (ngModelChange)="phoneNumber.set($event)">
                     <div class="divider-nospace"></div>
-                    <div class="mt-5"></div>
+                    <div class="mt-4"></div>
                     <div class="form-group password-field">
                         <label for="password">Mật khẩu</label>
-                        <input [type]="showPassword() ? 'text' : 'password'" placeholder="ít nhất 3 ký tự" class="form-control" id="password" [ngModel]="password()" (ngModelChange)="password.set($event)">
+                        <input [type]="showPassword() ? 'text' : 'password'" 
+                            placeholder="Nhập mật khẩu (ít nhất 3 ký tự)" 
+                            class="form-control" id="password" [ngModel]="password()" (ngModelChange)="password.set($event)">
                         <i [class]="showPassword() ? 'password-toggle fas fa-eye' : 'password-toggle fas fa-eye-slash'" (click)="showPassword.set(!showPassword())"></i>
                         <div class="divider-nospace"></div>
                     </div>
                     <div class="form-group">
-                        <div class="form-check checkbox-text">
-                            <span style="display: flex;">
-                                <input type="checkbox" class="form-check-input" id="remember">
-                                <label class="form-check-label text-start" for="remember">
-                                    Ghi nhớ đăng nhập</label>
-                            </span>
-                            <a href="#" class="register-link">Quên mật khẩu</a>
+                        <div class="form-check checkbox-text text-end">
+                            <a href="#" class="register-link">Quên mật khẩu?</a>
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <select class="form-control access-right" [ngModel]="roleId()" (ngModelChange)="roleId.set($event * 1)">
-                            <option [value]="1">Người dùng</option>
-                            <option [value]="2">Quản trị viên</option>
-                        </select>
                     </div>
                     <button type="button" class="login-button" (click)="login()">Đăng nhập</button>
                     <div class="divider"></div>

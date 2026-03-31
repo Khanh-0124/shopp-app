@@ -5,6 +5,7 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { HeaderComponent } from "../header/header";
 import { FooterComponent } from "../footer/footer";
 import { ProductService } from '../service/product.service';
+import { OrderListService } from '../service/order-list.service';
 
 @Component({
   selector: 'app-detail-product',
@@ -21,6 +22,7 @@ export class DetailProductComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private productService = inject(ProductService);
+  private orderListService = inject(OrderListService);
 
   ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
@@ -63,12 +65,14 @@ export class DetailProductComponent implements OnInit {
   }
 
   addToCart() {
-    alert(`Đã thêm ${this.quantity()} sản phẩm vào giỏ hàng!`);
-    // Will implement cart logic later if needed
+    if (this.product()) {
+      this.orderListService.addToOrder(this.product(), this.quantity());
+      alert(`Đã thêm ${this.quantity()} sản phẩm vào đơn hàng!`);
+    }
   }
   
   buyNow() {
     this.addToCart();
-    // this.router.navigate(['/cart']); // redirect to cart later
+    this.router.navigate(['/order']);
   }
 }

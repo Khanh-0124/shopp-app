@@ -12,23 +12,31 @@
 }
 
 .nav-link:hover,
-.nav-link.active {
+.nav-link.active,
+.show > .nav-link {
     color: #fff !important;
     transform: translateY(-2px);
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
 }
 
 .nav-link::after {
-    content: '';
+    display: none !important;
+}
+
+.nav-link-indicator {
     position: absolute;
-    bottom: 0;
-    left: 0;
+    bottom: -5px;
+    left: 50%;
+    transform: translateX(-50%);
     width: 0;
     height: 2px;
     background: #fff;
     transition: width 0.3s ease;
+    box-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
 }
 
-.nav-link:hover::after {
+.nav-link:hover .nav-link-indicator,
+.nav-link.active .nav-link-indicator {
     width: 100%;
 }
 
@@ -56,4 +64,12 @@
     input::placeholder {
         color: rgba(255, 255, 255, 0.5);
     }
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.hover-bg-light:hover {
+    background-color: #f1f5f9;
 }

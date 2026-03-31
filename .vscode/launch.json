@@ -1,0 +1,25 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Launch Chrome (ShopApp)",
+            "type": "chrome",
+            "request": "launch",
+            "url": "http://localhost:4300",
+            "webRoot": "${workspaceFolder}/shopapp-frontend",
+            "userDataDir": "${workspaceFolder}/.vscode/chrome-profile",
+            "sourceMaps": true,
+            "skipFiles": [
+                "<node_internals>/**"
+            ]
+        },
+        {
+            "name": "Attach to Chrome (ShopApp)",
+            "type": "chrome",
+            "request": "attach",
+            "port": 9222,
+            "urlFilter": "http://localhost:4300/*",
+            "webRoot": "${workspaceFolder}/shopapp-frontend"
+        }
+    ]
+}

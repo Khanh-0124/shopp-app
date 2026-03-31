@@ -4,22 +4,21 @@
     <div class="row g-5">
       <!-- Product Images Section -->
       <div class="col-lg-6">
-        <div class="main-image-container rounded-4 overflow-hidden mb-3 shadow-sm border border-white border-opacity-25" style="aspect-ratio: 1; background: #fff;">
-          <img [src]="getImageUrl(getProductImages()[currentImageIndex()])" 
-               class="w-100 h-100 object-fit-contain" 
-               alt="{{ product().name }}"
-               (error)="$event.target.src='https://via.placeholder.com/800x800?text=Invalid+Image+Link'">
+        <div class="main-image-container rounded-4 overflow-hidden mb-3 shadow-sm border border-white border-opacity-25"
+          style="aspect-ratio: 1; background: #fff;">
+          <img [src]="getImageUrl(getProductImages()[currentImageIndex()])" class="w-100 h-100 object-fit-contain"
+            alt="{{ product().name }}"
+            (error)="$event.target.src='https://via.placeholder.com/800x800?text=Invalid+Image+Link'">
         </div>
-        
+
         <!-- Thumbnails -->
         <div class="d-flex gap-3 overflow-auto pb-2 thumbnail-scroll">
           @for (img of getProductImages(); track img; let i = $index) {
-          <div class="thumbnail-item rounded-3 overflow-hidden border cursor-pointer" 
-               [ngClass]="i === currentImageIndex() ? 'border-primary border-2 shadow-sm' : 'border-secondary border-opacity-25'"
-               (click)="setCurrentImage(i)"
-               style="width: 80px; height: 80px; flex-shrink: 0; background: #fff;">
+          <div class="thumbnail-item rounded-3 overflow-hidden border cursor-pointer"
+            [ngClass]="i === currentImageIndex() ? 'border-primary border-2 shadow-sm' : 'border-secondary border-opacity-25'"
+            (click)="setCurrentImage(i)" style="width: 80px; height: 80px; flex-shrink: 0; background: #fff;">
             <img [src]="getImageUrl(img)" class="w-100 h-100 object-fit-cover" alt="thumbnail"
-                 (error)="$event.target.src='https://via.placeholder.com/150x150?text=Invalid'">
+              (error)="$event.target.src='https://via.placeholder.com/150x150?text=Invalid'">
           </div>
           }
         </div>
@@ -30,7 +29,8 @@
         <nav aria-label="breadcrumb" class="mb-3">
           <ol class="breadcrumb mb-0">
             <li class="breadcrumb-item"><a routerLink="/home" class="text-decoration-none text-muted">Trang chủ</a></li>
-            <li class="breadcrumb-item"><a href="#" class="text-decoration-none text-muted">Danh mục {{ product().category_id }}</a></li>
+            <li class="breadcrumb-item"><a href="#" class="text-decoration-none text-muted">Danh mục {{
+                product().category_id }}</a></li>
             <li class="breadcrumb-item active" aria-current="page">Chi tiết</li>
           </ol>
         </nav>
@@ -44,17 +44,27 @@
             <i class="fa-solid fa-star"></i>
             <i class="fa-solid fa-star-half-stroke"></i>
           </div>
-          <span class="text-muted">(Đánh giá tích cực)</span>
+          <!-- <span class="text-muted">(Đánh giá tích cực)</span> -->
         </div>
 
-        <div class="price-box p-4 rounded-4 mb-4 text-white" style="background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);">
-          <h2 class="display-4 fw-bold mb-0">{{ product().price | currency:'VND':'symbol':'1.0-0' }}</h2>
+        <div class="price-box px-4 py-3 rounded-4 mb-3 text-white align-self-start"
+          style="background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);">
+          <h2 class="display-4 fw-bold mb-0">{{ product().price | number:'1.0-0' }} đ</h2>
         </div>
-
+        <a href="https://zalo.me/0336969201" target="_blank" class="zalo-contact mb-4 text-decoration-none shadow-sm">
+          <div class="zalo-icon-wrapper">
+            <img src="/icons/zalo.svg" alt="Zalo">
+          </div>
+          <div class="zalo-info">
+            <span class="zalo-label">Tư vấn trực tiếp</span>
+            <span class="zalo-number">033.6969.201</span>
+          </div>
+        </a>
         <div class="mb-5 flex-grow-1">
           <h5 class="fw-bold mb-3">Mô tả sản phẩm</h5>
           <p class="text-secondary lh-lg fs-5">
-            {{ product().description || 'Chưa có thông tin mô tả chi tiết cho sản phẩm này. Hãy liên hệ bộ phận hỗ trợ nếu cần thêm chi tiết.' }}
+            {{ product().description || 'Chưa có thông tin mô tả chi tiết cho sản phẩm này. Hãy liên hệ bộ phận hỗ trợ
+            nếu cần thêm chi tiết.' }}
           </p>
         </div>
 
@@ -66,14 +76,14 @@
           <div class="quantity-control">
             <label class="form-label text-muted fw-bold small text-uppercase mb-2 d-block">Số lượng</label>
             <div class="input-group input-group-lg rounded-pill p-1 border shadow-sm bg-white" style="width: 150px;">
-              <button class="btn btn-light rounded-circle border-0 d-flex align-items-center justify-content-center" 
-                      style="width: 40px; height: 40px;" (click)="decreaseQuantity()">
+              <button class="btn btn-light rounded-circle border-0 d-flex align-items-center justify-content-center"
+                style="width: 40px; height: 40px;" (click)="decreaseQuantity()">
                 <i class="fa-solid fa-minus"></i>
               </button>
-              <input type="text" class="form-control border-0 text-center fw-bold bg-transparent mx-1" 
-                     [ngModel]="quantity()" readonly style="min-width: 40px;">
-              <button class="btn btn-light rounded-circle border-0 d-flex align-items-center justify-content-center" 
-                      style="width: 40px; height: 40px;" (click)="increaseQuantity()">
+              <input type="text" class="form-control border-0 text-center fw-bold bg-transparent mx-1"
+                [ngModel]="quantity()" readonly style="min-width: 40px;">
+              <button class="btn btn-light rounded-circle border-0 d-flex align-items-center justify-content-center"
+                style="width: 40px; height: 40px;" (click)="increaseQuantity()">
                 <i class="fa-solid fa-plus"></i>
               </button>
             </div>
@@ -81,20 +91,14 @@
 
           <!-- Add to Cart / Buy Now -->
           <div class="flex-grow-1 d-flex gap-3">
-            <button class="btn btn-outline-primary btn-lg rounded-pill flex-grow-1 fw-bold fs-5 px-4 shadow-sm"
-                    (click)="addToCart()" style="border-width: 2px;">
-              <i class="fa-solid fa-cart-plus me-2"></i> Thêm hàng
-            </button>
-            <button class="btn btn-primary btn-lg rounded-pill flex-grow-1 fw-bold fs-5 px-4 shadow-sm"
-                    (click)="buyNow()" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); border: none;">
-              Mua ngay <i class="fa-solid fa-arrow-right ms-2"></i>
+            <button class="btn btn-outline-primary btn-lg rounded-pill flex-grow-1 fw-bold fs-6 px-3 shadow-sm"
+              (click)="addToCart()" style="border-width: 2px;">
+              <i class="fa-solid fa-cart-plus me-2"></i> Thêm vào đơn hàng
             </button>
           </div>
         </div>
-
       </div>
     </div>
   </div>
-
 </div>
 <app-footer></app-footer>

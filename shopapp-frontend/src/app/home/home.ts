@@ -13,7 +13,7 @@ import { ProductService } from '../service/product.service';
   templateUrl: './home.html',
   styleUrl: './home.scss',
 })
-export class HomeComponent implements OnInit {
+export class Home implements OnInit {
   products = signal<any[]>([]);
   totalPages = signal<number>(0);
   currentPage = signal<number>(0);

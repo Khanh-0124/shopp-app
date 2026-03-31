@@ -70,7 +70,7 @@ public class UserController {
             String token = userService.login(
                     userLoginDTO.getPhoneNumber(),
                     userLoginDTO.getPassword(),
-                    userLoginDTO.getRoleId() == null ? 1 : userLoginDTO.getRoleId()
+                    userLoginDTO.getRoleId()
             );
             // Trả về token trong response
             return ResponseEntity.ok(LoginResponse.builder()

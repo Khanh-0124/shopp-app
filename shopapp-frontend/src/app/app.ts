@@ -1,12 +1,5 @@
 import { Component, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { HomeComponent } from './home/home';
-import { OrderComponent } from './order/order';
-import { OrderConfirmComponent } from "./order-confirm/order-confirm";
-import { LoginComponent } from './login/login';
-import { RegisterComponent } from './register/register';
-import { DetailProductComponent } from './detail-product/detail-product';
-
 import { LoadingComponent } from './loading/loading';
 
 @Component({
@@ -15,16 +8,29 @@ import { LoadingComponent } from './loading/loading';
   imports: [
     RouterOutlet,
     LoadingComponent,
-    HomeComponent,
-    // OrderComponent,
-    // OrderConfirmComponent,
-    // LoginComponent
-    // RegisterComponent
-    // DetailProductComponent
   ],
   template: `
     <app-loading></app-loading>
     <router-outlet></router-outlet>
+    
+    <!-- Floating Contact Buttons -->
+    <div class="floating-contact-wrapper">
+      <!-- Phone/Hotline Button -->
+      <a href="tel:0336969201" class="contact-floating-item phone-floating">
+        <div class="contact-tooltip">Gọi hotline</div>
+        <div class="contact-icon-container">
+          <img src="/icons/phone.png" alt="Phone Contact">
+        </div>
+      </a>
+
+      <!-- Zalo Button -->
+      <a href="https://zalo.me/0336969201" target="_blank" class="contact-floating-item zalo-floating">
+        <div class="contact-tooltip">Chat Zalo</div>
+        <div class="contact-icon-container">
+          <img src="/icons/zalo.svg" alt="Zalo Contact">
+        </div>
+      </a>
+    </div>
   `,
   styleUrl: './app.scss'
 })

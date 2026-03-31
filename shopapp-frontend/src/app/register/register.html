@@ -10,8 +10,8 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="phone">Số điện thoại</label>
-                            <input type="text" class="form-control" id="phone" [ngModel]="phone()"
-                                (ngModelChange)="phone.set($event)" (input)="onPhoneChange()">
+                            <input type="text" class="form-control" id="phone" placeholder="Nhập số điện thoại"
+                                [ngModel]="phone()" (ngModelChange)="phone.set($event)" (input)="onPhoneChange()">
                             @if (phoneError()) {
                             <div class="text-danger-custom">{{ phoneError() }}</div>
                             }
@@ -20,8 +20,8 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="full-name">Họ và tên</label>
-                            <input type="text" class="form-control" id="full-name" [ngModel]="fullName()"
-                                (ngModelChange)="fullName.set($event)" (input)="onFullNameChange()">
+                            <input type="text" class="form-control" id="full-name" placeholder="Nhập họ và tên"
+                                [ngModel]="fullName()" (ngModelChange)="fullName.set($event)" (input)="onFullNameChange()">
                             @if (fullNameError()) {
                             <div class="text-danger-custom">{{ fullNameError() }}</div>
                             }
@@ -32,7 +32,7 @@
                     <div class="col-md-6">
                         <div class="form-group password-field">
                             <label for="password">Mật khẩu</label>
-                            <input [type]="showPassword() ? 'text' : 'password'" placeholder="ít nhất 3 ký tự" class="form-control" id="password"
+                            <input [type]="showPassword() ? 'text' : 'password'" placeholder="Nhập mật khẩu (ít nhất 3 ký tự)" class="form-control" id="password"
                                 [ngModel]="password()" (ngModelChange)="password.set($event)"
                                 (input)="onPasswordChange()">
                             @if (passwordError()) {
@@ -44,7 +44,7 @@
                     <div class="col-md-6">
                         <div class="form-group password-field">
                             <label for="retype-password">Gõ lại mật khẩu</label>
-                            <input [type]="showRetypePassword() ? 'text' : 'password'" placeholder="Ít nhất 3 ký tự" class="form-control"
+                            <input [type]="showRetypePassword() ? 'text' : 'password'" placeholder="Nhập lại mật khẩu" class="form-control"
                                 id="retype-password" [ngModel]="retypePassword()"
                                 (ngModelChange)="retypePassword.set($event)" (input)="onRetypePasswordChange()">
                             @if (retypePasswordError()) {
@@ -58,8 +58,8 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="date-of-birth">Ngày tháng năm sinh</label>
-                            <input type="date" class="form-control" id="date-of-birth" [ngModel]="dateOfBirth()"
-                                (ngModelChange)="dateOfBirth.set($event)" (input)="onDateOfBirthChange()">
+                            <input type="date" class="form-control" id="date-of-birth"
+                                [ngModel]="dateOfBirth()" (ngModelChange)="dateOfBirth.set($event)" (input)="onDateOfBirthChange()">
                             @if (dateOfBirthError()) {
                             <div class="text-danger-custom">{{ dateOfBirthError() }}</div>
                             }
@@ -68,23 +68,12 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="address">Địa chỉ</label>
-                            <input type="text" class="form-control" id="address" [ngModel]="address()"
-                                (ngModelChange)="address.set($event)" (input)="onAddressChange()">
+                            <input type="text" class="form-control" id="address" placeholder="Nhập địa chỉ"
+                                [ngModel]="address()" (ngModelChange)="address.set($event)" (input)="onAddressChange()">
                             @if (addressError()) {
                             <div class="text-danger-custom">{{ addressError() }}</div>
                             }
                         </div>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <div class="form-check checkbox-text">
-                        <span style="display: flex;">
-                            <input [ngModel]="isAccepted()" (ngModelChange)="isAccepted.set($event)" type="checkbox"
-                                class="form-check-input" id="agree">
-                            <label class="form-check-label text-start" for="agree">
-                                Tôi đồng ý với các điều khoản và điều kiện</label>
-                        </span>
                     </div>
                 </div>
 

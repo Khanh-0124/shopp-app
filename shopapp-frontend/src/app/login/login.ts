@@ -23,8 +23,7 @@ export class LoginComponent {
   login() {
     const loginData = {
       phone_number: this.phoneNumber(),
-      password: this.password(),
-      role_id: Number(this.roleId())
+      password: this.password()
     };
 
     this.userService.login(loginData).subscribe({

@@ -3,10 +3,10 @@
 body {
   font-family: 'Inter', sans-serif;
   background-color: #f3f4f6;
-  background-image: 
-    radial-gradient(at 0% 0%, hsla(253,16%,7%,0.03) 0, transparent 50%), 
-    radial-gradient(at 50% 0%, hsla(225,39%,30%,0.03) 0, transparent 50%), 
-    radial-gradient(at 100% 0%, hsla(339,49%,30%,0.03) 0, transparent 50%);
+  background-image:
+    radial-gradient(at 0% 0%, hsla(253, 16%, 7%, 0.03) 0, transparent 50%),
+    radial-gradient(at 50% 0%, hsla(225, 39%, 30%, 0.03) 0, transparent 50%),
+    radial-gradient(at 100% 0%, hsla(339, 49%, 30%, 0.03) 0, transparent 50%);
   background-attachment: fixed;
   color: #1f2937;
   min-height: 100vh;
@@ -22,7 +22,10 @@ body {
 }
 
 // Smooth transitions globally
-a, button, .card, .glass-panel {
+a,
+button,
+.card,
+.glass-panel {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -31,6 +34,7 @@ a, button, .card, .glass-panel {
   background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
   border: none;
   font-weight: 600;
+
   &:hover {
     filter: brightness(110%);
     transform: translateY(-2px);
@@ -42,13 +46,143 @@ a, button, .card, .glass-panel {
 ::-webkit-scrollbar {
   width: 8px;
 }
+
 ::-webkit-scrollbar-track {
   background: #f1f1f1;
 }
+
 ::-webkit-scrollbar-thumb {
   background: #c7c7cc;
   border-radius: 4px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
   background: #a1a1aa;
+}
+
+// Floating Contact System
+.floating-contact-wrapper {
+  position: fixed;
+  right: 30px;
+  bottom: 50px;
+  display: flex;
+  flex-direction: column-reverse; // Zalo on top, Phone on bottom, or stacked
+  gap: 20px;
+  z-index: 9999;
+}
+
+.contact-floating-item {
+  width: 60px;
+  height: 60px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  text-decoration: none;
+
+  &:hover {
+    transform: scale(1.1) rotate(5deg);
+    
+    .contact-tooltip {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  .contact-icon-container {
+    position: relative;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    padding: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+    background: #fff;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+  }
+
+  // Common ripple animation base
+  &::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    z-index: 1;
+  }
+
+  .contact-tooltip {
+    position: absolute;
+    right: 75px;
+    background: #1f2937;
+    color: white;
+    padding: 8px 15px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    white-space: nowrap;
+    opacity: 0;
+    transform: translateX(10px);
+    transition: all 0.3s ease;
+    pointer-events: none;
+    box-shadow: 0 4px-12px rgba(0, 0, 0, 0.1);
+
+    &::after {
+      content: '';
+      position: absolute;
+      right: -6px;
+      top: 50%;
+      transform: translateY(-50%);
+      border-left: 6px solid #1f2937;
+      border-top: 6px solid transparent;
+      border-bottom: 6px solid transparent;
+    }
+  }
+}
+
+// Zalo Specific Styles
+.zalo-floating {
+  .contact-icon-container {
+    background: #0068ff;
+    box-shadow: 0 4px 15px rgba(0, 104, 255, 0.4);
+  }
+  
+  &::after {
+    background: #0068ff;
+    animation: contact-ripple 2s infinite;
+  }
+}
+
+// Phone Specific Styles
+.phone-floating {
+  .contact-icon-container {
+    background: #22c55e; // Green
+    box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4);
+  }
+
+  &::after {
+    background: #22c55e;
+    animation: contact-ripple 2.2s infinite; // Slightly different speed for variation
+  }
+}
+
+@keyframes contact-ripple {
+  0% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1.8);
+    opacity: 0;
+  }
 }
