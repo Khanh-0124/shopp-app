@@ -60,6 +60,13 @@ public class ProductService implements IProductService{
         // 1. Save Attributes and Values and keep them in a map for lookup
         java.util.Map<String, ProductAttributeValue> valueMap = new java.util.HashMap<>();
         
+        System.out.println("Processing Variants. HasVariants: " + productDTO.getHasVariants());
+        if (productDTO.getAttributeGroups() == null) System.out.println("DEBUG: attributeGroups is NULL");
+        else System.out.println("DEBUG: attributeGroups count: " + productDTO.getAttributeGroups().size());
+        
+        if (productDTO.getVariants() == null) System.out.println("DEBUG: variants is NULL");
+        else System.out.println("DEBUG: variants count: " + productDTO.getVariants().size());
+
         if (productDTO.getAttributeGroups() == null || productDTO.getVariants() == null) {
             return;
         }

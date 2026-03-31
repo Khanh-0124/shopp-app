@@ -38,6 +38,7 @@ public class ProductDTO {
     @JsonProperty("attribute_groups")
     private List<AttributeGroupDTO> attributeGroups;
 
+    @JsonProperty("variants")
     private List<VariantDTO> variants;
 
     @Data
