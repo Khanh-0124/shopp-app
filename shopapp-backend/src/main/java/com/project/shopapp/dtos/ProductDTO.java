@@ -32,5 +32,27 @@ public class ProductDTO {
     @JsonProperty("image_urls")
     private List<String> imageUrls;
 
+    @JsonProperty("has_variants")
+    private Boolean hasVariants;
+
+    @JsonProperty("attribute_groups")
+    private List<AttributeGroupDTO> attributeGroups;
+
+    private List<VariantDTO> variants;
+
+    @Data
+    public static class AttributeGroupDTO {
+        private String name;
+        private List<String> values;
+    }
+
+    @Data
+    public static class VariantDTO {
+        private List<String> combination;
+        private Float price;
+        private Integer stock;
+        private String sku;
+    }
+
 
 }

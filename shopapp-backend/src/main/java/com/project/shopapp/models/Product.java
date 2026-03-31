@@ -34,6 +34,9 @@ public class Product extends BaseEntity{
     @JoinColumn(name = "category_id")
     private Category category;
 
+    @Column(name = "has_variants", columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private Boolean hasVariants;
+
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<ProductImage> productImages;
 

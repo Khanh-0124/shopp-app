@@ -169,8 +169,8 @@ public class ProductController {
     @GetMapping("/{id}")
     public ResponseEntity<?> getProductById(@PathVariable("id") Long productId) {
         try {
-            Product existingProduct = productService.getProductById(productId);
-            return ResponseEntity.ok(ProductResponse.fromProduct(existingProduct));
+            ProductResponse response = productService.getProductResponseById(productId);
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

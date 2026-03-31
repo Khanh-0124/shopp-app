@@ -87,3 +87,31 @@
     }
   }
 }
+
+.btn-variant {
+    background: #f8fafc;
+    border: 2px solid #e2e8f0;
+    color: #475569;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    min-width: 80px;
+
+    &:hover {
+        border-color: #6366f1;
+        background: #f1f5f9;
+        color: #6366f1;
+        transform: translateY(-2px);
+    }
+
+    &.active {
+        background: #6366f1;
+        border-color: #6366f1;
+        color: white;
+        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        transform: scale(1.05);
+    }
+}
+
+.product-variations {
+    border-left: 3px solid #6366f1;
+    padding-left: 20px;
+}

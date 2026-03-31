@@ -19,6 +19,11 @@ export class DetailProductComponent implements OnInit {
   currentImageIndex = signal<number>(0);
   quantity = signal<number>(1);
   
+  // Variation state
+  selectedAttributes: { [key: string]: string } = {};
+  selectedVariant = signal<any>(null);
+  minPrice = signal<number>(0);
+
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private productService = inject(ProductService);
@@ -29,7 +34,11 @@ export class DetailProductComponent implements OnInit {
     if (id) {
       this.productService.getProductById(Number(id)).subscribe({
         next: (response) => {
+          console.log('--- DEBUG: FULL PRODUCT DATA FROM API ---');
+          console.log(response);
+          console.log('-----------------------------------------');
           this.product.set(response);
+          this.calculateInitialPrice(response);
           document.body.scrollTop = 0; // Scroll to top
         },
         error: (err) => {
@@ -37,6 +46,56 @@ export class DetailProductComponent implements OnInit {
         }
       });
     }
+  }
+
+  calculateInitialPrice(product: any) {
+    const hasVariants = product.has_variants || product.hasVariants;
+    console.log('Calculating price. Has Variants:', hasVariants, 'Variants Count:', product.variants?.length);
+    
+    if (hasVariants && product.variants && product.variants.length > 0) {
+      const prices = product.variants.map((v: any) => v.price).filter((p: any) => p > 0);
+      if (prices.length > 0) {
+        this.minPrice.set(Math.min(...prices));
+      } else {
+        this.minPrice.set(product.price);
+      }
+    } else {
+      this.minPrice.set(product.price);
+    }
+  }
+
+  selectAttribute(groupName: string, value: string) {
+    this.selectedAttributes[groupName] = value;
+    this.findMatchingVariant();
+  }
+
+  findMatchingVariant() {
+    const product = this.product();
+    if (!product || !product.has_variants || !product.variants) return;
+
+    // Check if all attribute groups have a selection
+    const allGroupsSelected = product.attributes.every((attr: any) => this.selectedAttributes[attr.name]);
+    
+    if (allGroupsSelected) {
+      // Find variant where combination matches all selected attributes
+      const matchingVariant = product.variants.find((v: any) => {
+        return product.attributes.every((attr: any, index: number) => {
+          return v.combination[index] === this.selectedAttributes[attr.name];
+        });
+      });
+      this.selectedVariant.set(matchingVariant || null);
+    } else {
+      this.selectedVariant.set(null);
+    }
+  }
+
+  isAttributeSelected(groupName: string, value: string): boolean {
+    return this.selectedAttributes[groupName] === value;
+  }
+
+  getDisplayPrice(): number {
+    const variant = this.selectedVariant();
+    return variant ? variant.price : this.minPrice();
   }
 
   getImageUrl(imageName: string | null): string {
@@ -65,13 +124,33 @@ export class DetailProductComponent implements OnInit {
   }
 
   addToCart() {
-    if (this.product()) {
-      this.orderListService.addToOrder(this.product(), this.quantity());
-      alert(`Đã thêm ${this.quantity()} sản phẩm vào đơn hàng!`);
+    const product = this.product();
+    if (!product) return;
+
+    if (product.has_variants && !this.selectedVariant()) {
+      alert('Vui lòng chọn đầy đủ phân loại (Màu sắc, Size...) trước khi mua!');
+      return;
     }
+
+    const itemToOrder = {
+      ...product,
+      price: this.getDisplayPrice(),
+      selectedVariant: this.selectedVariant() ? {
+          combination: this.selectedVariant().combination,
+          sku: this.selectedVariant().sku
+      } : null
+    };
+
+    this.orderListService.addToOrder(itemToOrder, this.quantity());
+    alert(`Đã thêm ${this.quantity()} sản phẩm vào đơn hàng!`);
   }
   
   buyNow() {
+    const product = this.product();
+    if (product.has_variants && !this.selectedVariant()) {
+      alert('Vui lòng chọn đầy đủ phân loại (Màu sắc, Size...)!');
+      return;
+    }
     this.addToCart();
     this.router.navigate(['/order']);
   }

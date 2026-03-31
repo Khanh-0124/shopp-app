@@ -7,9 +7,8 @@ import com.project.shopapp.exceptions.InvalidParamException;
 import com.project.shopapp.models.Category;
 import com.project.shopapp.models.Product;
 import com.project.shopapp.models.ProductImage;
-import com.project.shopapp.repositories.CategoryRepository;
-import com.project.shopapp.repositories.ProductImageRepository;
-import com.project.shopapp.repositories.ProductRepository;
+import com.project.shopapp.models.*;
+import com.project.shopapp.repositories.*;
 import com.project.shopapp.responses.ProductResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -17,6 +16,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,6 +26,10 @@ public class ProductService implements IProductService{
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
     private final ProductImageRepository productImageRepository;
+    private final ProductAttributeRepository attributeRepository;
+    private final ProductAttributeValueRepository attributeValueRepository;
+    private final ProductVariantRepository variantRepository;
+
     @Override
     @Transactional
     public Product createProduct(ProductDTO productDTO) throws DataNotFoundException {
@@ -41,8 +45,59 @@ public class ProductService implements IProductService{
                 .thumbnail(productDTO.getThumbnail())
                 .description(productDTO.getDescription())
                 .category(existingCategory)
+                .hasVariants(productDTO.getHasVariants())
                 .build();
-        return productRepository.save(newProduct);
+        Product savedProduct = productRepository.save(newProduct);
+        
+        if (productDTO.getHasVariants()) {
+            saveVariants(savedProduct, productDTO);
+        }
+        
+        return savedProduct;
+    }
+
+    private void saveVariants(Product product, ProductDTO productDTO) {
+        // 1. Save Attributes and Values and keep them in a map for lookup
+        java.util.Map<String, ProductAttributeValue> valueMap = new java.util.HashMap<>();
+        
+        for (ProductDTO.AttributeGroupDTO groupDTO : productDTO.getAttributeGroups()) {
+            ProductAttribute attribute = ProductAttribute.builder()
+                    .product(product)
+                    .name(groupDTO.getName())
+                    .build();
+            attributeRepository.save(attribute);
+
+            for (String value : groupDTO.getValues()) {
+                ProductAttributeValue attributeValue = ProductAttributeValue.builder()
+                        .attribute(attribute)
+                        .value(value)
+                        .build();
+                attributeValueRepository.save(attributeValue);
+                // Key is GroupName + Value
+                valueMap.put(groupDTO.getName() + "|" + value, attributeValue);
+            }
+        }
+
+        // 2. Save Variants
+        for (ProductDTO.VariantDTO variantDTO : productDTO.getVariants()) {
+            ProductVariant variant = ProductVariant.builder()
+                    .product(product)
+                    .price(variantDTO.getPrice())
+                    .stockQuantity(variantDTO.getStock())
+                    .sku(variantDTO.getSku())
+                    .build();
+            
+            java.util.List<ProductAttributeValue> variantValues = new java.util.ArrayList<>();
+            // Map combination to actual AttributeValue entities using index or map
+            for (int i = 0; i < variantDTO.getCombination().size(); i++) {
+                String valName = variantDTO.getCombination().get(i);
+                String groupName = productDTO.getAttributeGroups().get(i).getName();
+                ProductAttributeValue av = valueMap.get(groupName + "|" + valName);
+                if (av != null) variantValues.add(av);
+            }
+            variant.setAttributeValues(variantValues);
+            variantRepository.save(variant);
+        }
     }
 
     @Override
@@ -53,6 +108,16 @@ public class ProductService implements IProductService{
         }
         throw new DataNotFoundException("Cannot find product with id =" + productId);
     }
+
+    public ProductResponse getProductResponseById(long productId) throws Exception {
+        Product product = getProductById(productId);
+        ProductResponse response = ProductResponse.fromProduct(product);
+        if (product.getHasVariants()) {
+            response.setAttributes(mapAttributes(productId));
+            response.setVariants(mapVariants(productId));
+        }
+        return response;
+    }
     @Override
     public List<Product> findProductsByIds(List<Long> productIds) {
         return productRepository.findProductsByIds(productIds);
@@ -62,11 +127,39 @@ public class ProductService implements IProductService{
     @Override
     public Page<ProductResponse> getAllProducts(String keyword,
                                                 Long categoryId, PageRequest pageRequest) {
-        // Lấy danh sách sản phẩm theo trang (page), giới hạn (limit), và categoryId (nếu có)
         Page<Product> productsPage;
         productsPage = productRepository.searchProducts(categoryId, keyword, pageRequest);
-        return productsPage.map(ProductResponse::fromProduct);
+        return productsPage.map(product -> {
+            ProductResponse response = ProductResponse.fromProduct(product);
+            if (product.getHasVariants()) {
+                // Map variants to response
+                response.setAttributes(mapAttributes(product.getId()));
+                response.setVariants(mapVariants(product.getId()));
+            }
+            return response;
+        });
     }
+
+    private List<ProductResponse.ProductAttributeResponse> mapAttributes(Long productId) {
+        return attributeRepository.findByProductId(productId).stream()
+                .map(attr -> ProductResponse.ProductAttributeResponse.builder()
+                        .name(attr.getName())
+                        .values(attr.getAttributeValues().stream().map(ProductAttributeValue::getValue).toList())
+                        .build())
+                .toList();
+    }
+
+    private List<ProductResponse.ProductVariantResponse> mapVariants(Long productId) {
+        return variantRepository.findByProductId(productId).stream()
+                .map(v -> ProductResponse.ProductVariantResponse.builder()
+                        .combination(v.getAttributeValues().stream().map(ProductAttributeValue::getValue).toList())
+                        .price(v.getPrice())
+                        .stock(v.getStockQuantity())
+                        .sku(v.getSku())
+                        .build())
+                .toList();
+    }
+
     @Override
     @Transactional
     public Product updateProduct(
@@ -76,8 +169,6 @@ public class ProductService implements IProductService{
             throws Exception {
         Product existingProduct = getProductById(id);
         if(existingProduct != null) {
-            //copy các thuộc tính từ DTO -> Product
-            //Có thể sử dụng ModelMapper
             Category existingCategory = categoryRepository
                     .findById(productDTO.getCategoryId())
                     .orElseThrow(() ->
@@ -88,7 +179,19 @@ public class ProductService implements IProductService{
             existingProduct.setPrice(productDTO.getPrice());
             existingProduct.setDescription(productDTO.getDescription());
             existingProduct.setThumbnail(productDTO.getThumbnail());
-            return productRepository.save(existingProduct);
+            existingProduct.setHasVariants(productDTO.getHasVariants());
+            
+            // Handle variants update: Delete old and save new (Simple approach)
+            if (existingProduct.getHasVariants()) {
+                variantRepository.deleteByProductId(id);
+                attributeRepository.deleteByProductId(id);
+            }
+            
+            Product savedProduct = productRepository.save(existingProduct);
+            if (productDTO.getHasVariants()) {
+                saveVariants(savedProduct, productDTO);
+            }
+            return savedProduct;
         }
         return null;
 

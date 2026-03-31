@@ -28,6 +28,33 @@ public class ProductResponse extends BaseResponse{
 
     @JsonProperty("category_id")
     private Long categoryId;
+
+    @JsonProperty("has_variants")
+    private Boolean has_variants = false;
+
+    @JsonProperty("debug_test_field")
+    private String debugTestField = "BACKEND_CO_CAP_NHAT_ROI";
+
+    private List<ProductAttributeResponse> attributes;
+
+    private List<ProductVariantResponse> variants;
+
+    @Data
+    @Builder
+    public static class ProductAttributeResponse {
+        private String name;
+        private List<String> values;
+    }
+
+    @Data
+    @Builder
+    public static class ProductVariantResponse {
+        private List<String> combination;
+        private Float price;
+        private Integer stock;
+        private String sku;
+    }
+
     public static ProductResponse fromProduct(Product product) {
         ProductResponse productResponse = ProductResponse.builder()
                 .id(product.getId())
@@ -37,6 +64,8 @@ public class ProductResponse extends BaseResponse{
                 .description(product.getDescription())
                 .categoryId(product.getCategory().getId())
                 .productImages(product.getProductImages())
+                .has_variants(product.getHasVariants() != null && product.getHasVariants())
+                .debugTestField("BACKEND_CO_CAP_NHAT_ROI")
                 .build();
         productResponse.setCreatedAt(product.getCreatedAt());
         productResponse.setUpdatedAt(product.getUpdatedAt());

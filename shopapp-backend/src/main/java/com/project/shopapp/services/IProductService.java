@@ -25,4 +25,5 @@ public interface IProductService {
     List<Product> findProductsByIds(List<Long> productIds);
     void deleteAllProducts();
     void deleteProductImage(long id);
+    ProductResponse getProductResponseById(long productId) throws Exception;
 }
