@@ -60,6 +60,10 @@ public class ProductService implements IProductService{
         // 1. Save Attributes and Values and keep them in a map for lookup
         java.util.Map<String, ProductAttributeValue> valueMap = new java.util.HashMap<>();
         
+        if (productDTO.getAttributeGroups() == null || productDTO.getVariants() == null) {
+            return;
+        }
+        
         for (ProductDTO.AttributeGroupDTO groupDTO : productDTO.getAttributeGroups()) {
             ProductAttribute attribute = ProductAttribute.builder()
                     .product(product)
@@ -188,7 +192,7 @@ public class ProductService implements IProductService{
             }
             
             Product savedProduct = productRepository.save(existingProduct);
-            if (Boolean.TRUE.equals(productDTO.getHasVariants())) {
+            if (Boolean.TRUE.equals(productDTO.getHasVariants()) && productDTO.getAttributeGroups() != null) {
                 saveVariants(savedProduct, productDTO);
             }
             return savedProduct;
