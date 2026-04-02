@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
@@ -323,14 +323,36 @@ import { environment } from '../../../environments/environment';
 
           <!-- SECTION: DESCRIPTION -->
           <div class="col-12 mt-5">
-             <h5 class="section-title"><i class="fa-solid fa-file-pen me-2"></i>Mô tả sản phẩm</h5>
-             <div class="textarea-custom-wrapper p-1 rounded-5 border bg-light focus-within-brand">
-                <textarea class="form-control border-0 bg-transparent p-4 fw-500 shadow-none" rows="8"
-                         [(ngModel)]="productData.description" name="description" 
-                         required #desc="ngModel" [class.is-invalid]="desc.invalid && desc.touched"
-                         placeholder="Viết mô tả cuốn hút cho sản phẩm của bạn tại đây..."></textarea>
+             <div class="d-flex align-items-center justify-content-between mb-3">
+                <h5 class="section-title mb-0"><i class="fa-solid fa-file-pen me-2"></i>Mô tả sản phẩm</h5>
+                <div class="editor-toolbar d-flex flex-wrap gap-1 p-1 bg-white border rounded-4 shadow-sm">
+                   <button type="button" class="btn btn-editor" [class.active]="isStyleActive('bold')" (click)="doFormat('bold')" title="Chữ đậm"><i class="fa-solid fa-bold"></i></button>
+                   <button type="button" class="btn btn-editor" [class.active]="isStyleActive('italic')" (click)="doFormat('italic')" title="Chữ nghiêng"><i class="fa-solid fa-italic"></i></button>
+                   <button type="button" class="btn btn-editor" [class.active]="isStyleActive('underline')" (click)="doFormat('underline')" title="Gạch chân"><i class="fa-solid fa-underline"></i></button>
+                   <div class="vr mx-1 my-1"></div>
+                   <button type="button" class="btn btn-editor" [class.active]="isStyleActive('insertUnorderedList')" (click)="doFormat('insertUnorderedList')" title="Danh sách chấm"><i class="fa-solid fa-list-ul"></i></button>
+                   <button type="button" class="btn btn-editor" [class.active]="isStyleActive('insertOrderedList')" (click)="doFormat('insertOrderedList')" title="Danh sách số"><i class="fa-solid fa-list-ol"></i></button>
+                   <div class="vr mx-1 my-1"></div>
+                   <button type="button" class="btn btn-editor" [class.active]="isStyleActive('justifyLeft')" (click)="doFormat('justifyLeft')" title="Căn trái"><i class="fa-solid fa-align-left"></i></button>
+                   <button type="button" class="btn btn-editor" [class.active]="isStyleActive('justifyCenter')" (click)="doFormat('justifyCenter')" title="Căn giữa"><i class="fa-solid fa-align-center"></i></button>
+                   <button type="button" class="btn btn-editor" [class.active]="isStyleActive('justifyRight')" (click)="doFormat('justifyRight')" title="Căn phải"><i class="fa-solid fa-align-right"></i></button>
+                   <div class="vr mx-1 my-1"></div>
+                   <button type="button" class="btn btn-editor text-danger" (click)="doFormat('removeFormat')" title="Xóa định dạng"><i class="fa-solid fa-eraser"></i></button>
+                </div>
              </div>
-             <div class="invalid-feedback d-block mt-2" *ngIf="desc.invalid && desc.touched">Vui lòng nhập mô tả sản phẩm.</div>
+             
+             <div class="rich-editor-wrapper rounded-5 border bg-white focus-within-brand overflow-hidden shadow-sm">
+                <div class="editor-content p-4 fw-500" 
+                     contenteditable="true" 
+                     #editorRef 
+                     (keyup)="onEditorInput(editorRef.innerHTML)"
+                     (mouseup)="onEditorInput(editorRef.innerHTML)"
+                     (blur)="onEditorInput(editorRef.innerHTML)"
+                     style="min-height: 400px; outline: none;"
+                     data-placeholder="Viết mô tả cuốn hút cho sản phẩm của bạn tại đây...">
+                </div>
+             </div>
+             <div class="text-muted small mt-2">Mô tả hiển thị trực tiếp với định dạng HTML trên trang chi tiết sản phẩm.</div>
           </div>
 
           <!-- ACTIONS -->
@@ -502,6 +524,32 @@ import { environment } from '../../../environments/environment';
     .badge-input-wrapper:focus-within { ring: 2px solid #6366f1; }
     input:focus { outline: none !important; }
     .cursor-pointer { cursor: pointer; }
+
+    /* Editor Specific Styles */
+    .btn-editor {
+       width: 34px; height: 34px; 
+       display: flex; align-items: center; justify-content: center;
+       border-radius: 8px; border: none; background: transparent;
+       color: #64748b; font-size: 0.9rem; transition: all 0.2s;
+    }
+    .btn-editor:hover { background: #f1f5f9; color: #0f172a; }
+    .btn-editor.active { background: #eef2ff; color: #6366f1; }
+    .editor-toolbar { border-color: #e2e8f0 !important; }
+    
+    .editor-content:empty:before {
+      content: attr(data-placeholder);
+      color: #94a3b8;
+    }
+    .rich-editor-wrapper {
+       min-height: 400px;
+       border-color: #e2e8f0;
+    }
+    .editor-content {
+       min-height: 400px;
+       line-height: 1.6;
+    }
+    .editor-content ul, .editor-content ol { padding-left: 1.5rem; margin-bottom: 1rem; }
+    .editor-content b, .editor-content strong { font-weight: 800; }
   `]
 })
 export class AdminProductFormComponent implements OnInit {
@@ -533,6 +581,8 @@ export class AdminProductFormComponent implements OnInit {
   private productService = inject(ProductService);
   private userService = inject(UserService);
   private categoryService = inject(CategoryService);
+
+  @ViewChild('editorRef') editorRef!: ElementRef;
 
   ngOnInit() {
     this.loadCategories();
@@ -684,7 +734,7 @@ export class AdminProductFormComponent implements OnInit {
   }
 
   getImageUrl(thumbnail: string | null): string {
-    if (!thumbnail || thumbnail === "") return 'https://via.placeholder.com/150x150?text=No+Image';
+    if (!thumbnail || thumbnail === "") return 'https://placehold.co/150x150?text=TRONG';
     if (thumbnail.startsWith('http://') || thumbnail.startsWith('https://')) return thumbnail;
     if (thumbnail.startsWith('http://') || thumbnail.startsWith('https://')) return thumbnail;
     return `${environment.apiBaseUrl}/products/images/${thumbnail}`;
@@ -726,6 +776,13 @@ export class AdminProductFormComponent implements OnInit {
         // Support loading variants if they exist (pending Backend update)
         if (res.attributes) this.attributeGroups = res.attributes;
         if (res.variants) this.productVariants = res.variants;
+
+        // Populate editor content
+        setTimeout(() => {
+          if (this.editorRef) {
+            this.editorRef.nativeElement.innerHTML = res.description || '';
+          }
+        }, 0);
       },
       error: (err) => this.toastService.error('Lỗi tải sản phẩm: ' + err.message)
     });
@@ -777,6 +834,30 @@ export class AdminProductFormComponent implements OnInit {
     } else {
       this.goBack();
     }
+  }
+
+  onEditorInput(value: string) {
+    this.productData.description = value;
+  }
+
+  doFormat(command: string, value: string | undefined = undefined) {
+    document.execCommand(command, false, value);
+    // Sync model after format
+    if (this.editorRef) {
+      this.onEditorInput(this.editorRef.nativeElement.innerHTML);
+    }
+  }
+
+  isStyleActive(command: string): boolean {
+    try {
+      return document.queryCommandState(command);
+    } catch(e) {
+      return false;
+    }
+  }
+
+  formatDoc(command: string, value: string | undefined = undefined) {
+    this.doFormat(command, value);
   }
 
   goBack() {

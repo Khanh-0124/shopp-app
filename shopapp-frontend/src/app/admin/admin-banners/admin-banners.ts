@@ -223,7 +223,7 @@ export class AdminBannersComponent implements OnInit {
   }
 
   getImageUrl(url: string | null): string {
-    if (!url) return 'https://via.placeholder.com/800x300?text=No+Image';
+    if (!url) return 'https://placehold.co/800x300?text=TRONG';
     if (url.startsWith('http')) return url;
     return `http://localhost:8088/api/v1/banners/images/${url}`;
   }
