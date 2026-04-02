@@ -165,7 +165,7 @@ export class Home implements OnInit, OnDestroy {
   }
 
   getImageUrl(thumbnail: string | null): string {
-    if (!thumbnail || thumbnail === "") return 'https://via.placeholder.com/300x300?text=No+Image';
+    if (!thumbnail || thumbnail === "") return 'https://placehold.co/300x300?text=TRONG';
     if (thumbnail.startsWith('http://') || thumbnail.startsWith('https://')) return thumbnail;
     return `${environment.apiBaseUrl}/products/images/${thumbnail}`;
   }

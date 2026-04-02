@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -95,8 +95,8 @@ import { environment } from '../../../environments/environment';
                       </div>
                       
                       <div class="upload-area p-3 border border-dashed rounded-4 text-center bg-white">
-                         <input type="file" id="fileInput" class="d-none" (change)="onFileSelected($event)" accept="image/*">
-                         <button type="button" class="btn btn-outline-primary rounded-pill px-4" onclick="document.getElementById('fileInput').click()">
+                         <input type="file" #fileInput id="fileInput" class="d-none" (change)="onFileSelected($event)" accept="image/*">
+                         <button type="button" class="btn btn-outline-primary rounded-pill px-4" (click)="fileInput.click()">
                             <i class="fa-solid fa-cloud-arrow-up me-2"></i>Tải Ảnh Lên Từ Máy Tính
                          </button>
                          <p class="small text-muted mt-2 mb-0">Hỗ trợ JPG, PNG (Tối đa 10MB)</p>
@@ -198,6 +198,7 @@ export class AdminBannersComponent implements OnInit {
 
   private bannerService = inject(BannerService);
   private toastService = inject(ToastService);
+  private cdr = inject(ChangeDetectorRef);
 
   ngOnInit() {
     this.loadBanners();
@@ -215,8 +216,11 @@ export class AdminBannersComponent implements OnInit {
     if (file) {
       this.bannerService.uploadImage(file).subscribe({
         next: (filename) => {
-          this.currentBanner.image_url = filename;
-          this.toastService.success('Đã tải ảnh lên thành công!');
+          setTimeout(() => {
+            this.currentBanner.image_url = filename;
+            this.toastService.success('Đã tải ảnh lên thành công!');
+            this.cdr.detectChanges();
+          }, 0);
         },
         error: (err) => this.toastService.error('Lỗi khi tải ảnh lên!')
       });

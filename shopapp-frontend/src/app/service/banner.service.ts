@@ -19,21 +19,21 @@ export class BannerService {
   }
 
   createBanner(bannerDTO: any): Observable<any> {
-    const token = localStorage.getItem('access_token');
+    const token = localStorage.getItem('token');
     return this.http.post(this.apiUrl, bannerDTO, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
   }
 
   updateBanner(id: number, bannerDTO: any): Observable<any> {
-    const token = localStorage.getItem('access_token');
+    const token = localStorage.getItem('token');
     return this.http.put(`${this.apiUrl}/${id}`, bannerDTO, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
   }
 
   deleteBanner(id: number): Observable<any> {
-    const token = localStorage.getItem('access_token');
+    const token = localStorage.getItem('token');
     return this.http.delete(`${this.apiUrl}/${id}`, {
       headers: { 'Authorization': `Bearer ${token}` },
       responseType: 'text' as 'json'
@@ -43,7 +43,7 @@ export class BannerService {
   uploadImage(file: File): Observable<string> {
     const formData = new FormData();
     formData.append('file', file);
-    const token = localStorage.getItem('access_token');
+    const token = localStorage.getItem('token');
     return this.http.post(`${this.apiUrl}/uploads`, formData, {
       headers: { 'Authorization': `Bearer ${token}` },
       responseType: 'text'
