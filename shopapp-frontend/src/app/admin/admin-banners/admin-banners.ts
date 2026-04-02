@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { ToastService } from '../../service/toast.service';
 import { BannerService } from '../../service/banner.service';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-admin-banners',
@@ -225,7 +226,7 @@ export class AdminBannersComponent implements OnInit {
   getImageUrl(url: string | null): string {
     if (!url) return 'https://placehold.co/800x300?text=TRONG';
     if (url.startsWith('http')) return url;
-    return `http://localhost:8088/api/v1/banners/images/${url}`;
+    return `${environment.apiBaseUrl}/banners/images/${url}`;
   }
 
   openAddModal() {

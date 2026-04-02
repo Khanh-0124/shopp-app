@@ -104,8 +104,8 @@ public class WebSecurityConfig {
                                     String.format("%s/order_details/**", apiPrefix)).permitAll()
 
                             .requestMatchers(GET,
-                                    String.format("%s/banners**", apiPrefix)).permitAll()
-                            .requestMatchers(GET,
+                                    String.format("%s/banners", apiPrefix),
+                                    String.format("%s/banners**", apiPrefix),
                                     String.format("%s/banners/**", apiPrefix)).permitAll()
                             .requestMatchers(POST,
                                     String.format("%s/banners/**", apiPrefix)).hasAnyRole(Role.ADMIN)

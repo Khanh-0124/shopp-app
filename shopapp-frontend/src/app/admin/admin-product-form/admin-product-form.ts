@@ -9,10 +9,10 @@ import { ToastService } from '../../service/toast.service';
 import { environment } from '../../../environments/environment';
 
 @Component({
-  selector: 'app-admin-product-form',
-  standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
-  template: `
+   selector: 'app-admin-product-form',
+   standalone: true,
+   imports: [CommonModule, FormsModule, RouterModule],
+   template: `
     <div class="row mb-4 align-items-center">
       <div class="col-md-6">
         <h2 class="fw-800 text-dark mb-1">{{ isEditMode() ? 'Chỉnh Sửa Sản Phẩm' : 'Thêm Sản Phẩm Mới' }}</h2>
@@ -367,7 +367,7 @@ import { environment } from '../../../environments/environment';
       </div>
     </div>
   `,
-  styles: [`
+   styles: [`
     .fw-800 { font-weight: 800; }
     .fw-700 { font-weight: 700; }
     .fw-500 { font-weight: 500; }
@@ -553,155 +553,155 @@ import { environment } from '../../../environments/environment';
   `]
 })
 export class AdminProductFormComponent implements OnInit {
-  isEditMode = signal<boolean>(false);
-  productId = signal<number>(0);
-  
-  productData: any = {
-    name: '',
-    price: 0,
-    thumbnail: '',
-    description: '',
-    category_id: '',
-    image_urls: [],
-    has_variants: false
-  };
+   isEditMode = signal<boolean>(false);
+   productId = signal<number>(0);
 
-  // Shopee-style classification state
-  attributeGroups: any[] = [];
-  productVariants: any[] = [];
+   productData: any = {
+      name: '',
+      price: 0,
+      thumbnail: '',
+      description: '',
+      category_id: '',
+      image_urls: [],
+      has_variants: false
+   };
+
+   // Shopee-style classification state
+   attributeGroups: any[] = [];
+   productVariants: any[] = [];
 
    selectedFiles: File[] = [];
    selectedFilesPreviews: string[] = [];
-   imageLinks: string[] = ['']; 
+   imageLinks: string[] = [''];
    categories = signal<any[]>([]);
    existingImages: any[] = [];
-  private route = inject(ActivatedRoute);
-  private router = inject(Router);
-  private toastService = inject(ToastService);
-  private productService = inject(ProductService);
-  private userService = inject(UserService);
-  private categoryService = inject(CategoryService);
+   private route = inject(ActivatedRoute);
+   private router = inject(Router);
+   private toastService = inject(ToastService);
+   private productService = inject(ProductService);
+   private userService = inject(UserService);
+   private categoryService = inject(CategoryService);
 
-  @ViewChild('editorRef') editorRef!: ElementRef;
+   @ViewChild('editorRef') editorRef!: ElementRef;
 
-  ngOnInit() {
-    this.loadCategories();
-    const id = this.route.snapshot.paramMap.get('id');
-    if (id) {
-      this.isEditMode.set(true);
-      this.productId.set(Number(id));
-      this.loadProduct(Number(id));
-    }
-  }
-
-  // --- Classification Methods ---
-  addAttributeGroup() {
-    if (this.attributeGroups.length < 2) {
-      this.attributeGroups.push({ name: '', values: [] });
-    }
-  }
-
-  removeAttributeGroup(index: number) {
-    this.attributeGroups.splice(index, 1);
-    this.generateVariants();
-  }
-
-  addAttributeValue(groupIndex: number, input: any) {
-    const value = input.value.trim();
-    if (value && !this.attributeGroups[groupIndex].values.includes(value)) {
-      this.attributeGroups[groupIndex].values.push(value);
-      input.value = '';
-      this.generateVariants();
-    }
-  }
-
-  removeAttributeValue(groupIndex: number, valIndex: number) {
-    this.attributeGroups[groupIndex].values.splice(valIndex, 1);
-    this.generateVariants();
-  }
-
-  generateVariants() {
-    if (this.attributeGroups.length === 0 || this.attributeGroups.every(g => g.values.length === 0)) {
-      this.productVariants = [];
-      return;
-    }
-
-    const combinations = this.cartesianProduct(
-      this.attributeGroups.filter(g => g.values.length > 0).map(g => g.values)
-    );
-
-    // Keep existing data if possible
-    const oldVariants = [...this.productVariants];
-    
-    this.productVariants = combinations.map(combo => {
-      const existing = oldVariants.find(v => JSON.stringify(v.combination) === JSON.stringify(combo));
-      return {
-        combination: combo,
-        price: existing ? existing.price : this.productData.price,
-        stock: existing ? existing.stock : 0,
-        sku: existing ? existing.sku : ''
-      };
-    });
-    this.updateMinPriceFromVariants();
-  }
-
-  updateMinPriceFromVariants() {
-    if (this.productVariants.length > 0) {
-      const prices = this.productVariants
-        .map(v => Number(v.price))
-        .filter(p => !isNaN(p) && p > 0);
-      
-      if (prices.length > 0) {
-        this.productData.price = Math.min(...prices);
+   ngOnInit() {
+      this.loadCategories();
+      const id = this.route.snapshot.paramMap.get('id');
+      if (id) {
+         this.isEditMode.set(true);
+         this.productId.set(Number(id));
+         this.loadProduct(Number(id));
       }
-    }
-  }
+   }
 
-  private cartesianProduct(arrays: any[][]): any[][] {
-    return arrays.reduce((acc, curr) => {
-      return acc.flatMap(a => curr.map(b => [...a, b]));
-    }, [[]] as any[][]);
-  }
+   // --- Classification Methods ---
+   addAttributeGroup() {
+      if (this.attributeGroups.length < 2) {
+         this.attributeGroups.push({ name: '', values: [] });
+      }
+   }
 
-  updateAllPrices(price: any) {
-    const p = Number(price);
-    if (!isNaN(p)) {
-      this.productVariants.forEach(v => v.price = p);
+   removeAttributeGroup(index: number) {
+      this.attributeGroups.splice(index, 1);
+      this.generateVariants();
+   }
+
+   addAttributeValue(groupIndex: number, input: any) {
+      const value = input.value.trim();
+      if (value && !this.attributeGroups[groupIndex].values.includes(value)) {
+         this.attributeGroups[groupIndex].values.push(value);
+         input.value = '';
+         this.generateVariants();
+      }
+   }
+
+   removeAttributeValue(groupIndex: number, valIndex: number) {
+      this.attributeGroups[groupIndex].values.splice(valIndex, 1);
+      this.generateVariants();
+   }
+
+   generateVariants() {
+      if (this.attributeGroups.length === 0 || this.attributeGroups.every(g => g.values.length === 0)) {
+         this.productVariants = [];
+         return;
+      }
+
+      const combinations = this.cartesianProduct(
+         this.attributeGroups.filter(g => g.values.length > 0).map(g => g.values)
+      );
+
+      // Keep existing data if possible
+      const oldVariants = [...this.productVariants];
+
+      this.productVariants = combinations.map(combo => {
+         const existing = oldVariants.find(v => JSON.stringify(v.combination) === JSON.stringify(combo));
+         return {
+            combination: combo,
+            price: existing ? existing.price : this.productData.price,
+            stock: existing ? existing.stock : 0,
+            sku: existing ? existing.sku : ''
+         };
+      });
       this.updateMinPriceFromVariants();
-    }
-  }
+   }
 
-  updateAllStocks(stock: any) {
-    const s = Number(stock);
-    if (!isNaN(s)) {
-      this.productVariants.forEach(v => v.stock = s);
-    }
-  }
-  // -----------------------------
+   updateMinPriceFromVariants() {
+      if (this.productVariants.length > 0) {
+         const prices = this.productVariants
+            .map(v => Number(v.price))
+            .filter(p => !isNaN(p) && p > 0);
 
-  addImageLink() {
-    this.imageLinks.push('');
-  }
+         if (prices.length > 0) {
+            this.productData.price = Math.min(...prices);
+         }
+      }
+   }
 
-  removeImageLink(index: number) {
-    this.imageLinks.splice(index, 1);
-    if (this.imageLinks.length === 0) this.imageLinks.push('');
-  }
+   private cartesianProduct(arrays: any[][]): any[][] {
+      return arrays.reduce((acc, curr) => {
+         return acc.flatMap(a => curr.map(b => [...a, b]));
+      }, [[]] as any[][]);
+   }
 
-  setPrimaryImage(url: string) {
-    this.productData.thumbnail = url;
-  }
+   updateAllPrices(price: any) {
+      const p = Number(price);
+      if (!isNaN(p)) {
+         this.productVariants.forEach(v => v.price = p);
+         this.updateMinPriceFromVariants();
+      }
+   }
 
-  draggedIndex: number | null = null;
-  onDragStart(index: number) { this.draggedIndex = index; }
-  onDragOver(event: Event) { event.preventDefault(); }
-  onDrop(event: Event, targetIndex: number) {
-    event.preventDefault();
-    if (this.draggedIndex === null || this.draggedIndex === targetIndex) return;
-    const movedItem = this.existingImages.splice(this.draggedIndex, 1)[0];
-    this.existingImages.splice(targetIndex, 0, movedItem);
-    this.draggedIndex = null;
-  }
+   updateAllStocks(stock: any) {
+      const s = Number(stock);
+      if (!isNaN(s)) {
+         this.productVariants.forEach(v => v.stock = s);
+      }
+   }
+   // -----------------------------
+
+   addImageLink() {
+      this.imageLinks.push('');
+   }
+
+   removeImageLink(index: number) {
+      this.imageLinks.splice(index, 1);
+      if (this.imageLinks.length === 0) this.imageLinks.push('');
+   }
+
+   setPrimaryImage(url: string) {
+      this.productData.thumbnail = url;
+   }
+
+   draggedIndex: number | null = null;
+   onDragStart(index: number) { this.draggedIndex = index; }
+   onDragOver(event: Event) { event.preventDefault(); }
+   onDrop(event: Event, targetIndex: number) {
+      event.preventDefault();
+      if (this.draggedIndex === null || this.draggedIndex === targetIndex) return;
+      const movedItem = this.existingImages.splice(this.draggedIndex, 1)[0];
+      this.existingImages.splice(targetIndex, 0, movedItem);
+      this.draggedIndex = null;
+   }
 
    moveToFront(index: number) {
       if (index > 0) {
@@ -713,44 +713,44 @@ export class AdminProductFormComponent implements OnInit {
    }
 
    deleteExistingImage(imageId: number) {
-    if (confirm('Bạn có chắc chắn muốn xóa ảnh này không?')) {
-      const token = this.userService.getToken();
-      if (!token) return;
-      const originalImages = [...this.existingImages];
-      const deletedImg = this.existingImages.find(img => img.id === imageId);
-      this.existingImages = this.existingImages.filter(img => img.id !== imageId);
-      if (deletedImg && deletedImg.image_url === this.productData.thumbnail) {
-        this.productData.thumbnail = '';
+      if (confirm('Bạn có chắc chắn muốn xóa ảnh này không?')) {
+         const token = this.userService.getToken();
+         if (!token) return;
+         const originalImages = [...this.existingImages];
+         const deletedImg = this.existingImages.find(img => img.id === imageId);
+         this.existingImages = this.existingImages.filter(img => img.id !== imageId);
+         if (deletedImg && deletedImg.image_url === this.productData.thumbnail) {
+            this.productData.thumbnail = '';
+         }
+         this.productService.deleteProductImage(imageId, token).subscribe({
+            next: () => console.log('Xóa ảnh thành công'),
+            error: (err) => {
+               this.existingImages = originalImages;
+               alert('Lỗi: ' + (err.error || err.message));
+               this.toastService.error('Lỗi: ' + (err.error || err.message));
+            }
+         });
       }
-      this.productService.deleteProductImage(imageId, token).subscribe({
-        next: () => console.log('Xóa ảnh thành công'),
-        error: (err) => {
-          this.existingImages = originalImages;
-          alert('Lỗi: ' + (err.error || err.message));
-          this.toastService.error('Lỗi: ' + (err.error || err.message));
-        }
+   }
+
+   getImageUrl(thumbnail: string | null): string {
+      if (!thumbnail || thumbnail === "") return 'https://placehold.co/150x150?text=TRONG';
+      if (thumbnail.startsWith('http://') || thumbnail.startsWith('https://')) return thumbnail;
+      if (thumbnail.startsWith('http://') || thumbnail.startsWith('https://')) return thumbnail;
+      return `${environment.apiBaseUrl}/products/images/${thumbnail}`;
+   }
+
+   loadCategories() {
+      this.categoryService.getCategories().subscribe({
+         next: (res) => this.categories.set(res),
+         error: (err) => this.toastService.error('Lỗi tải danh mục: ' + err.message)
       });
-    }
-  }
-
-  getImageUrl(thumbnail: string | null): string {
-    if (!thumbnail || thumbnail === "") return 'https://placehold.co/150x150?text=TRONG';
-    if (thumbnail.startsWith('http://') || thumbnail.startsWith('https://')) return thumbnail;
-    if (thumbnail.startsWith('http://') || thumbnail.startsWith('https://')) return thumbnail;
-    return `${environment.apiBaseUrl}/products/images/${thumbnail}`;
-  }
-
-  loadCategories() {
-    this.categoryService.getCategories().subscribe({
-      next: (res) => this.categories.set(res),
-      error: (err) => this.toastService.error('Lỗi tải danh mục: ' + err.message)
-    });
-  }
+   }
 
    onFileChange(event: any) {
       const files = Array.from(event.target.files) as File[];
       this.selectedFiles = [...this.selectedFiles, ...files];
-      
+
       // Update previews
       this.selectedFilesPreviews = this.selectedFiles.map(file => URL.createObjectURL(file));
    }
@@ -760,107 +760,107 @@ export class AdminProductFormComponent implements OnInit {
       this.selectedFilesPreviews.splice(index, 1);
    }
 
-  loadProduct(id: number) {
-    this.productService.getProductById(id).subscribe({
-      next: (res) => {
-        this.productData = {
-          name: res.name,
-          price: res.price,
-          thumbnail: res.thumbnail,
-          description: res.description,
-          category_id: res.category_id,
-          image_urls: [],
-          has_variants: res.has_variants || false
-        };
-        this.existingImages = res.product_images || [];
-        // Support loading variants if they exist (pending Backend update)
-        if (res.attributes) this.attributeGroups = res.attributes;
-        if (res.variants) this.productVariants = res.variants;
+   loadProduct(id: number) {
+      this.productService.getProductById(id).subscribe({
+         next: (res) => {
+            this.productData = {
+               name: res.name,
+               price: res.price,
+               thumbnail: res.thumbnail,
+               description: res.description,
+               category_id: res.category_id,
+               image_urls: [],
+               has_variants: res.has_variants || false
+            };
+            this.existingImages = res.product_images || [];
+            // Support loading variants if they exist (pending Backend update)
+            if (res.attributes) this.attributeGroups = res.attributes;
+            if (res.variants) this.productVariants = res.variants;
 
-        // Populate editor content
-        setTimeout(() => {
-          if (this.editorRef) {
-            this.editorRef.nativeElement.innerHTML = res.description || '';
-          }
-        }, 0);
-      },
-      error: (err) => this.toastService.error('Lỗi tải sản phẩm: ' + err.message)
-    });
-  }
-
-  saveProduct(form: any) {
-    if (form.invalid) {
-      this.toastService.warning('Vui lòng điền đầy đủ các trường bắt buộc!');
-      return;
-    }
-
-    const token = this.userService.getToken();
-    if (!token) return;
-
-    this.productData.image_urls = this.imageLinks.filter(link => link.trim() !== '');
-    
-    // Prepare data for backend
-    const payload = {
-        ...this.productData,
-        has_variants: this.productVariants.length > 0,
-        attribute_groups: this.attributeGroups,
-        variants: this.productVariants
-    };
-
-    if (this.isEditMode()) {
-      this.productService.updateProduct(this.productId(), payload, token).subscribe({
-        next: (res) => this.uploadImages(this.productId(), token),
-        error: (err) => this.toastService.error('Lỗi cập nhật: ' + (err.error || err.message))
+            // Populate editor content
+            setTimeout(() => {
+               if (this.editorRef) {
+                  this.editorRef.nativeElement.innerHTML = res.description || '';
+               }
+            }, 0);
+         },
+         error: (err) => this.toastService.error('Lỗi tải sản phẩm: ' + err.message)
       });
-    } else {
-      this.productService.createProduct(payload, token).subscribe({
-        next: (res) => this.uploadImages(res.id, token),
-        error: (err) => this.toastService.error('Lỗi khi tạo: ' + (err.error || err.message))
-      });
-    }
-  }
+   }
 
-  uploadImages(productId: number, token: string) {
-    if (this.selectedFiles.length > 0) {
-      this.productService.uploadImages(productId, this.selectedFiles, token).subscribe({
-        next: () => {
-          this.goBack();
-        },
-        error: (err) => {
-          alert('Upload ảnh lỗi: ' + (err.error || err.message));
-          this.goBack();
-        }
-      });
-    } else {
-      this.goBack();
-    }
-  }
+   saveProduct(form: any) {
+      if (form.invalid) {
+         this.toastService.warning('Vui lòng điền đầy đủ các trường bắt buộc!');
+         return;
+      }
 
-  onEditorInput(value: string) {
-    this.productData.description = value;
-  }
+      const token = this.userService.getToken();
+      if (!token) return;
 
-  doFormat(command: string, value: string | undefined = undefined) {
-    document.execCommand(command, false, value);
-    // Sync model after format
-    if (this.editorRef) {
-      this.onEditorInput(this.editorRef.nativeElement.innerHTML);
-    }
-  }
+      this.productData.image_urls = this.imageLinks.filter(link => link.trim() !== '');
 
-  isStyleActive(command: string): boolean {
-    try {
-      return document.queryCommandState(command);
-    } catch(e) {
-      return false;
-    }
-  }
+      // Prepare data for backend
+      const payload = {
+         ...this.productData,
+         has_variants: this.productVariants.length > 0,
+         attribute_groups: this.attributeGroups,
+         variants: this.productVariants
+      };
 
-  formatDoc(command: string, value: string | undefined = undefined) {
-    this.doFormat(command, value);
-  }
+      if (this.isEditMode()) {
+         this.productService.updateProduct(this.productId(), payload, token).subscribe({
+            next: (res) => this.uploadImages(this.productId(), token),
+            error: (err) => this.toastService.error('Lỗi cập nhật: ' + (err.error || err.message))
+         });
+      } else {
+         this.productService.createProduct(payload, token).subscribe({
+            next: (res) => this.uploadImages(res.id, token),
+            error: (err) => this.toastService.error('Lỗi khi tạo: ' + (err.error || err.message))
+         });
+      }
+   }
 
-  goBack() {
-    this.router.navigate(['/admin/products']);
-  }
+   uploadImages(productId: number, token: string) {
+      if (this.selectedFiles.length > 0) {
+         this.productService.uploadImages(productId, this.selectedFiles, token).subscribe({
+            next: () => {
+               this.goBack();
+            },
+            error: (err) => {
+               alert('Upload ảnh lỗi: ' + (err.error || err.message));
+               this.goBack();
+            }
+         });
+      } else {
+         this.goBack();
+      }
+   }
+
+   onEditorInput(value: string) {
+      this.productData.description = value;
+   }
+
+   doFormat(command: string, value: string | undefined = undefined) {
+      document.execCommand(command, false, value);
+      // Sync model after format
+      if (this.editorRef) {
+         this.onEditorInput(this.editorRef.nativeElement.innerHTML);
+      }
+   }
+
+   isStyleActive(command: string): boolean {
+      try {
+         return document.queryCommandState(command);
+      } catch (e) {
+         return false;
+      }
+   }
+
+   formatDoc(command: string, value: string | undefined = undefined) {
+      this.doFormat(command, value);
+   }
+
+   goBack() {
+      this.router.navigate(['/admin/products']);
+   }
 }
