@@ -1,5 +1,6 @@
 package com.project.shopapp.models;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -18,9 +19,11 @@ public class Banner {
     @Column(name = "title", length = 255)
     private String title;
 
+    @JsonProperty("sub_title")
     @Column(name = "sub_title", length = 500)
     private String subTitle;
 
+    @JsonProperty("image_url")
     @Column(name = "image_url", length = 1000)
     private String imageUrl;
 

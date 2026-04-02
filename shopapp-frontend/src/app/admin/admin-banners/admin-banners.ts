@@ -77,11 +77,11 @@ import { environment } from '../../../environments/environment';
     }
 
     <!-- MODAL: ADD/EDIT BANNER -->
-    <div class="modal fade" id="bannerModal" tabindex="-1" aria-hidden="true" [class.show]="showModal" [style.display]="showModal ? 'block' : 'none'">
+    <div class="modal fade" id="bannerModal" tabindex="-1" aria-hidden="true" [class.show]="showModal()" [style.display]="showModal() ? 'block' : 'none'">
       <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content border-0 rounded-5 shadow-2xl overflow-hidden animate-zoom">
           <div class="modal-header bg-dark p-4 border-0">
-            <h5 class="modal-title fw-800 text-white"><i class="fa-solid fa-magic-sparkles me-2"></i>{{ isEdit ? 'Cập Nhật' : 'Tạo Mới' }} Banner</h5>
+            <h5 class="modal-title fw-800 text-white"><i class="fa-solid fa-magic-sparkles me-2"></i>{{ isEdit() ? 'Cập Nhật' : 'Tạo Mới' }} Banner</h5>
             <button type="button" class="btn-close btn-close-white" (click)="closeModal()"></button>
           </div>
           <div class="modal-body p-4 p-lg-5">
@@ -132,13 +132,13 @@ import { environment } from '../../../environments/environment';
           <div class="modal-footer p-4 border-light bg-light justify-content-center">
             <button type="button" class="btn btn-light-lg rounded-pill px-5 fw-bold" (click)="closeModal()">Thoát</button>
             <button type="button" class="btn btn-brand-lg rounded-pill px-5 fw-bold shadow-brand" (click)="saveBanner()">
-               {{ isEdit ? 'Lưu Thay Đổi' : 'Lưu Banner' }}
+               {{ isEdit() ? 'Lưu Thay Đổi' : 'Lưu Banner' }}
             </button>
           </div>
         </div>
       </div>
     </div>
-    <div class="modal-backdrop fade show" *ngIf="showModal"></div>
+    <div class="modal-backdrop fade show" *ngIf="showModal()"></div>
   `,
   styles: [`
     .fw-800 { font-weight: 800; }
@@ -192,8 +192,8 @@ import { environment } from '../../../environments/environment';
 })
 export class AdminBannersComponent implements OnInit {
   banners = signal<any[]>([]);
-  showModal = false;
-  isEdit = false;
+  showModal = signal(false);
+  isEdit = signal(false);
   currentBanner: any = { id: 0, title: '', sub_title: '', image_url: '', link: '', active: true };
 
   private bannerService = inject(BannerService);
@@ -234,19 +234,19 @@ export class AdminBannersComponent implements OnInit {
   }
 
   openAddModal() {
-    this.isEdit = false;
+    this.isEdit.set(false);
     this.currentBanner = { title: '', sub_title: '', image_url: '', link: '', active: true };
-    this.showModal = true;
+    this.showModal.set(true);
   }
 
   editBanner(banner: any) {
-    this.isEdit = true;
+    this.isEdit.set(true);
     this.currentBanner = { ...banner };
-    this.showModal = true;
+    this.showModal.set(true);
   }
 
   closeModal() {
-    this.showModal = false;
+    this.showModal.set(false);
   }
 
   saveBanner() {
@@ -255,21 +255,25 @@ export class AdminBannersComponent implements OnInit {
       return;
     }
 
-    if (this.isEdit) {
+    if (this.isEdit()) {
       this.bannerService.updateBanner(this.currentBanner.id, this.currentBanner).subscribe({
         next: () => {
-          this.toastService.success('Cập nhật banner thành công!');
-          this.loadBanners();
-          this.closeModal();
+          setTimeout(() => {
+            this.toastService.success('Cập nhật banner thành công!');
+            this.loadBanners();
+            this.closeModal();
+          }, 0);
         },
         error: (err) => this.toastService.error('Lỗi cập nhật banner!')
       });
     } else {
       this.bannerService.createBanner(this.currentBanner).subscribe({
         next: () => {
-          this.toastService.success('Thêm banner mới thành công!');
-          this.loadBanners();
-          this.closeModal();
+          setTimeout(() => {
+            this.toastService.success('Thêm banner mới thành công!');
+            this.loadBanners();
+            this.closeModal();
+          }, 0);
         },
         error: (err) => this.toastService.error('Lỗi thêm banner!')
       });
