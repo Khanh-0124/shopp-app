@@ -10,9 +10,13 @@ export class ProductService {
   private apiUrl = `${environment.apiBaseUrl}/products`;
   private http = inject(HttpClient);
 
-  // Cache state
   private lastCacheKey = '';
   private cachedData = signal<any>(null);
+
+  clearCache() {
+    this.lastCacheKey = '';
+    this.cachedData.set(null);
+  }
 
   getProducts(keyword: string, categoryId: number, page: number, limit: number): Observable<any> {
     const cacheKey = `${keyword}-${categoryId}-${page}-${limit}`;
@@ -44,27 +48,27 @@ export class ProductService {
   createProduct(productDTO: any, token: string): Observable<any> {
     return this.http.post(this.apiUrl, productDTO, {
       headers: { 'Authorization': `Bearer ${token}` }
-    });
+    }).pipe(tap(() => this.clearCache()));
   }
 
   updateProduct(productId: number, productDTO: any, token: string): Observable<any> {
     return this.http.put(`${this.apiUrl}/${productId}`, productDTO, {
       headers: { 'Authorization': `Bearer ${token}` }
-    });
+    }).pipe(tap(() => this.clearCache()));
   }
 
   deleteProduct(productId: number, token: string): Observable<any> {
     return this.http.delete(`${this.apiUrl}/${productId}`, {
       headers: { 'Authorization': `Bearer ${token}` },
       responseType: 'text' as 'json'
-    });
+    }).pipe(tap(() => this.clearCache()));
   }
 
   deleteAllProducts(token: string): Observable<any> {
     return this.http.delete(this.apiUrl, {
       headers: { 'Authorization': `Bearer ${token}` },
       responseType: 'text' as 'json'
-    });
+    }).pipe(tap(() => this.clearCache()));
   }
 
   uploadImages(productId: number, files: File[], token: string): Observable<any> {

@@ -1,76 +1,147 @@
-<div class="container">
-    <nav
-        class="navbar navbar-expand-lg navbar-dark bg-transparent py-2 mb-2 border-bottom border-light border-opacity-10">
-        <div class="container-fluid p-0">
-            <a class="navbar-brand fs-2" routerLink="/home">
-                <i class="fa-solid fa-house"></i>
-            </a>
+<div class="main-header-wrapper shadow-sm">
+    <div class="container">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-transparent py-3">
+            <div class="container-fluid p-0">
+                <!-- Mobile Menu Button (Left) -->
+                <button class="navbar-toggler d-lg-none border-0 shadow-none ps-0" type="button" (click)="toggleDrawer(true)">
+                   <i class="fa-solid fa-bars-staggered fs-3"></i>
+                </button>
 
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarContent">
-                <ul class="navbar-nav ms-auto mb-2 mb-lg-0 gap-lg-4 align-items-center">
-                    <li class="nav-item position-relative">
-                        <div class="search-box-header d-flex align-items-center bg-white bg-opacity-10 border border-white border-opacity-25 rounded-pill px-3 py-1 shadow-sm">
-                            <i class="fa-solid fa-magnifying-glass text-white opacity-50 small me-2"></i>
-                            <input type="text" class="form-control form-control-sm border-0 bg-transparent text-white shadow-none ps-0" 
-                                   placeholder="Tìm sản phẩm..." style="width: 180px; font-size: 0.85rem;"
-                                   [ngModel]="keyword()" (ngModelChange)="onKeywordChange($event)" (keyup.enter)="onSearch()"
-                                   (blur)="searchSuggestions.set([])">
-                        </div>
-                        <!-- Search Suggestions Dropdown -->
-                        <div *ngIf="searchSuggestions().length > 0" 
-                             class="position-absolute bg-white rounded-3 shadow-lg mt-2 w-100 overflow-hidden" 
-                             style="top: 100%; z-index: 1050; border: 1px solid rgba(0,0,0,0.1);">
-                            <div *ngFor="let product of searchSuggestions()" 
-                                 (mousedown)="selectSuggestion(product)"
-                                 class="p-2 border-bottom hover-bg-light cursor-pointer d-flex align-items-center gap-2">
-                                <img [src]="getImageUrl(product.thumbnail)" 
-                                     style="width: 30px; height: 30px; object-fit: cover;" class="rounded shadow-sm">
-                                <div class="text-dark small text-truncate">{{ product.name }}</div>
-                            </div>
-                        </div>
-                    </li>
-                    <!-- Dropdown Phân loại -->
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="categoryDropdown" role="button" 
-                           data-bs-toggle="dropdown" aria-expanded="false" [class.active]="isCategoryActive()">
-                            Phân loại
-                            <span class="nav-link-indicator"></span>
-                        </a>
-                        <ul class="dropdown-menu shadow-lg border-0 rounded-3 mt-2" aria-labelledby="categoryDropdown">
-                            <li><a class="dropdown-item" routerLink="/home" [queryParams]="{category_id: 0}" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Tất cả sản phẩm</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li *ngFor="let cat of categories()">
-                                <a class="dropdown-item" routerLink="/home" [queryParams]="{category_id: cat.id}" routerLinkActive="active">
-                                    {{ cat.name }}
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
+                <a class="navbar-brand fs-2 mx-auto mx-lg-0" routerLink="/home">
+                    <i class="fa-solid fa-house"></i>
+                </a>
 
-                    <li class="nav-item">
-                        <a class="nav-link position-relative" routerLink="/order" routerLinkActive="active">
-                            Đơn hàng
-                            <span *ngIf="totalOrderItems() > 0" class="position-absolute translate-middle badge rounded-pill bg-danger" 
-                                  style="top: 0; left: 100%; font-size: 0.65rem;">
-                                {{ totalOrderItems() }}
-                            </span>
-                            <span class="nav-link-indicator"></span>
-                        </a>
-                    </li>
-                    @if (isAdmin) {
-                        <li class="nav-item"><a class="nav-link text-warning fw-bold" routerLink="/admin" routerLinkActive="active">Trang Quản Trị<span class="nav-link-indicator"></span></a></li>
-                    }
-                    <li class="nav-item">
-                        <a class="nav-link align-items-center d-flex gap-2" (click)="navigateToProfile()" style="cursor: pointer;">
-                            <i class="fa-solid fa-user fs-4"></i>
-                            <span class="nav-link-indicator"></span>
-                        </a>
-                    </li>
-                </ul>
+                <!-- DESKTOP MENU (HIDDEN ON MOBILE) -->
+                <div class="collapse navbar-collapse d-none d-lg-block" id="navbarContent">
+                    <ul class="navbar-nav ms-auto mb-2 mb-lg-0 gap-lg-4 align-items-center">
+                        <li class="nav-item position-relative">
+                           <div class="search-box-header d-flex align-items-center bg-white bg-opacity-10 border border-white border-opacity-25 rounded-pill px-3 py-1 shadow-sm">
+                               <i class="fa-solid fa-magnifying-glass text-white opacity-50 small me-2"></i>
+                               <input type="text" class="form-control form-control-sm border-0 bg-transparent text-white shadow-none ps-0" 
+                                      placeholder="Tìm sản phẩm..." style="width: 180px; font-size: 0.85rem;"
+                                      [ngModel]="keyword()" (ngModelChange)="onKeywordChange($event)" (keyup.enter)="onSearch()"
+                                      (blur)="searchSuggestions.set([])">
+                           </div>
+                           <!-- Search Suggestions -->
+                           <div *ngIf="searchSuggestions().length > 0" 
+                                class="position-absolute bg-white rounded-3 shadow-lg mt-2 w-100 overflow-hidden" 
+                                style="top: 100%; z-index: 1050; border: 1px solid rgba(0,0,0,0.1);">
+                               <div *ngFor="let product of searchSuggestions()" 
+                                    (mousedown)="selectSuggestion(product)"
+                                    class="p-2 border-bottom hover-bg-light cursor-pointer d-flex align-items-center gap-2">
+                                   <img [src]="getImageUrl(product.thumbnail)" 
+                                        style="width: 30px; height: 30px; object-fit: cover;" class="rounded shadow-sm">
+                                   <div class="text-dark small text-truncate">{{ product.name }}</div>
+                               </div>
+                           </div>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link position-relative" routerLink="/order" routerLinkActive="active">
+                                Đơn hàng
+                                <span *ngIf="totalOrderItems() > 0" class="position-absolute translate-middle badge rounded-pill bg-danger" 
+                                      style="top: 0; left: 100%; font-size: 0.65rem;">
+                                    {{ totalOrderItems() }}
+                                </span>
+                            </a>
+                        </li>
+                        @if (isAdmin) {
+                            <li class="nav-item"><a class="nav-link text-warning fw-bold" routerLink="/admin" routerLinkActive="active">Trang Quản Trị</a></li>
+                        }
+                        <li class="nav-item">
+                            <a class="nav-link align-items-center d-flex gap-2" (click)="navigateToProfile()" style="cursor: pointer;">
+                                <i class="fa-solid fa-user fs-4"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- MOBILE ACTION ICONS (RIGHT) -->
+                <div class="d-flex d-lg-none gap-3">
+                   <a class="nav-link text-white position-relative" routerLink="/order">
+                      <i class="fa-solid fa-receipt fs-4"></i>
+                      <span *ngIf="totalOrderItems() > 0" class="position-absolute translate-middle badge rounded-pill bg-danger" 
+                            style="top: 0; left: 100%; font-size: 0.6rem;">{{ totalOrderItems() }}</span>
+                   </a>
+                   <a class="nav-link text-white" (click)="navigateToProfile()">
+                      <i class="fa-solid fa-user fs-4"></i>
+                   </a>
+                </div>
             </div>
-        </div>
-    </nav>
+        </nav>
+    </div>
+</div>
+
+<!-- MOBILE DRAWER OVERLAY -->
+<div class="drawer-overlay" [class.show]="isDrawerOpen" (click)="toggleDrawer(false)"></div>
+
+<!-- MOBILE DRAWER MENU -->
+<div class="app-drawer shadow-2xl" [class.show]="isDrawerOpen">
+   <div class="drawer-header p-4 d-flex justify-content-between align-items-center border-bottom bg-dark text-white">
+      <h5 class="fw-800 mb-0"><i class="fa-solid fa-house me-2"></i>MENU</h5>
+      <button class="btn btn-close btn-close-white" (click)="toggleDrawer(false)"></button>
+   </div>
+   
+   <div class="drawer-body p-0">
+      <div class="p-4 bg-light border-bottom position-relative">
+         <div class="search-box-drawer d-flex align-items-center bg-white border rounded-pill px-3 py-2 shadow-sm">
+             <i class="fa-solid fa-magnifying-glass text-muted small me-2"></i>
+             <input type="text" class="form-control form-control-sm border-0 bg-transparent shadow-none ps-0" 
+                    placeholder="Tìm sản phẩm..."
+                    [ngModel]="keyword()" (ngModelChange)="onKeywordChange($event)" (keyup.enter)="onSearch()"
+                    (blur)="searchSuggestions.set([])">
+         </div>
+         <!-- MOBILE Search Suggestions -->
+         <div *ngIf="searchSuggestions().length > 0" 
+              class="position-absolute bg-white rounded-3 shadow-lg mt-1 w-100 overflow-hidden" 
+              style="left: 0; top: 100%; z-index: 1200; border: 1px solid rgba(0,0,0,0.1); width: calc(100% - 3rem); margin-left: 1.5rem;">
+             <div *ngFor="let product of searchSuggestions()" 
+                  (mousedown)="selectSuggestion(product)"
+                  class="p-3 border-bottom hover-bg-light cursor-pointer d-flex align-items-center gap-3">
+                 <img [src]="getImageUrl(product.thumbnail)" 
+                      style="width: 44px; height: 44px; object-fit: cover;" class="rounded shadow-sm">
+                 <div>
+                    <div class="text-dark fw-700 small">{{ product.name }}</div>
+                    <div class="text-indigo small fw-800">{{ product.price | currency:'VND':'symbol':'1.0-0' }}</div>
+                 </div>
+             </div>
+         </div>
+      </div>
+      
+      <ul class="drawer-nav-list list-unstyled m-0">
+         <li>
+            <a routerLink="/home" (click)="toggleDrawer(false)" class="p-4 d-flex align-items-center gap-3 text-dark text-decoration-none border-bottom">
+               <i class="fa-solid fa-house fs-5 text-indigo"></i>
+               <span class="fw-700">Trang Chủ</span>
+            </a>
+         </li>
+         <li>
+            <a routerLink="/order" (click)="toggleDrawer(false)" class="p-4 d-flex align-items-center justify-content-between text-dark text-decoration-none border-bottom">
+               <div class="d-flex align-items-center gap-3">
+                  <i class="fa-solid fa-receipt fs-5 text-indigo"></i>
+                  <span class="fw-700">Đơn Hàng</span>
+               </div>
+               <span *ngIf="totalOrderItems() > 0" class="badge rounded-pill bg-danger">{{ totalOrderItems() }}</span>
+            </a>
+         </li>
+         @if (isAdmin) {
+         <li>
+            <a routerLink="/admin" (click)="toggleDrawer(false)" class="p-4 d-flex align-items-center gap-3 text-warning text-decoration-none border-bottom bg-dark bg-opacity-5">
+               <i class="fa-solid fa-shield-halved fs-5"></i>
+               <span class="fw-800">Trang Quản Trị</span>
+            </a>
+         </li>
+         }
+         <li>
+            <a (click)="navigateToProfile(); toggleDrawer(false)" class="p-4 d-flex align-items-center gap-3 text-dark text-decoration-none border-bottom cursor-pointer">
+               <i class="fa-solid fa-user-gear fs-5 text-indigo"></i>
+               <span class="fw-700">Tài Khoản</span>
+            </a>
+         </li>
+      </ul>
+   </div>
+   
+   <div class="drawer-footer p-4 text-center text-muted small border-top">
+      © 2024 Photo Frame Shop
+   </div>
 </div>

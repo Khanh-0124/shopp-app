@@ -17,10 +17,15 @@ import { CategoryService } from '../service/category.service';
   styleUrl: './header.scss',
 })
 export class HeaderComponent implements OnInit {
-  keyword = signal<string>('');
-  searchSuggestions = signal<any[]>([]);
-  categories = signal<any[]>([]);
-  private searchSubject = new Subject<string>();
+   keyword = signal<string>('');
+   searchSuggestions = signal<any[]>([]);
+   categories = signal<any[]>([]);
+   isDrawerOpen: boolean = false;
+   private searchSubject = new Subject<string>();
+
+   toggleDrawer(state: boolean) {
+      this.isDrawerOpen = state;
+   }
 
   private userService = inject(UserService);
   private router = inject(Router);
@@ -55,26 +60,29 @@ export class HeaderComponent implements OnInit {
     if (!newVal) this.searchSuggestions.set([]);
   }
 
-  selectSuggestion(product: any) {
-    this.keyword.set(product.name);
-    this.searchSuggestions.set([]);
-    this.router.navigate(['/products', product.id]);
-  }
+   selectSuggestion(product: any) {
+      this.keyword.set(product.name);
+      this.searchSuggestions.set([]);
+      this.toggleDrawer(false); // Close drawer on mobile
+      this.router.navigate(['/products', product.id]);
+   }
 
-  onSearch() {
-    this.router.navigate(['/home'], {
-      queryParams: { keyword: this.keyword() },
-      queryParamsHandling: 'merge'
-    });
-  }
+   onSearch() {
+      this.toggleDrawer(false); // Close drawer on mobile
+      this.router.navigate(['/home'], {
+         queryParams: { keyword: this.keyword() },
+         queryParamsHandling: 'merge'
+      });
+   }
 
-  navigateToProfile() {
-    if (this.userService.isLoggedIn()) {
-      this.router.navigate(['/account']);
-    } else {
-      this.router.navigate(['/login']);
-    }
-  }
+   navigateToProfile() {
+      this.toggleDrawer(false); // Close drawer on mobile
+      if (this.userService.isLoggedIn()) {
+         this.router.navigate(['/account']);
+      } else {
+         this.router.navigate(['/login']);
+      }
+   }
 
   get isAdmin(): boolean {
     return this.userService.isAdmin();

@@ -1,99 +1,181 @@
 <app-header></app-header>
-<div class="container my-3">
-  <!-- Search Results Info -->
-  @if (keyword()) {
-    <div class="search-result-box" *ngIf="keyword()">
-      <h3>Kết quả tìm kiếm cho: <span class="keyword-text">"{{ keyword() }}"</span></h3>
-      <div class="result-count">Tìm thấy {{ products().length }} sản phẩm</div>
-    </div>
-  }
 
-  <!-- Product Grid -->
-  <div class="row g-4">
-    @for (product of products(); track product.id) {
-    <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
-      <div class="product-card h-100 rounded-3 overflow-hidden position-relative" (click)="goToDetail(product.id)">
-        <div class="card-img-wrapper overflow-hidden position-relative">
-          <img [src]="getImageUrl(product.thumbnail)" 
-               class="product-img object-fit-cover w-100"
-               alt="{{ product.name }}"
-               style="height: 180px;"
-               (error)="$event.target.src='https://via.placeholder.com/150x150?text=Invalid+Link'">
+<main class="home-modern-wrapper">
+  <!-- HERO SECTION: FULL HORIZONTAL SLIDING CAROUSEL -->
+  <section class="banner-carousel-wrapper mb-5 overflow-hidden" *ngIf="banners().length > 0">
+    <div class="carousel-track d-flex" [style.transform]="'translateX(' + (-currentIndex() * 100) + '%)'" 
+         style="transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1); width: 100%;">
+       
+       <!-- Each Banner Slide -->
+       <div class="hero-slide w-100 flex-shrink-0" *ngFor="let b of banners(); let i = index">
+          <section class="hero-section py-5 position-relative overflow-hidden" 
+                   style="min-height: 65vh; background: #fff;">
+             <!-- Decorative Elements -->
+             <div class="blob blob-1"></div><div class="blob blob-2"></div><div class="blob blob-3"></div>
+             
+             <div class="container position-relative z-1 h-100">
+               <div class="row align-items-center justify-content-between h-100">
+                 <div class="col-lg-6 mb-5 mb-lg-0 text-center text-lg-start">
+                   <span class="badge bg-soft-primary text-primary px-3 py-2 rounded-pill fw-bold mb-3">CHIẾN DỊCH KHUYẾN MÃI 2024</span>
+                   <h1 class="display-3 fw-1000 text-dark mb-4 tracking-tight leading-tight">
+                      {{ b.title }}
+                   </h1>
+                   <p class="lead text-secondary mb-5 opacity-80 pe-lg-5">
+                      {{ b.sub_title }}
+                   </p>
+                   <div class="d-flex flex-wrap gap-3 justify-content-center justify-content-lg-start">
+                     <button class="btn btn-brand-lg rounded-pill px-5 py-3 fw-bold shadow-brand" [routerLink]="b.link || '/products'">Khám phá ngay <i class="fa-solid fa-arrow-right ms-2"></i></button>
+                     <button class="btn btn-outline-light-lg rounded-pill px-5 py-3 fw-bold">Tư Vấn Thêm</button>
+                   </div>
+                 </div>
+                 <div class="col-lg-5">
+                   <div class="hero-image-stack position-relative h-100 p-3">
+                      <!-- Main Image Slide -->
+                      <div class="main-hero-card rounded-5 shadow-2xl overflow-hidden animate-float">
+                        <img [src]="b.image_url" 
+                             class="img-fluid w-100" 
+                             alt="Slide Image"
+                             style="height: 420px; object-fit: cover;"
+                             (error)="$event.target.src='https://images.unsplash.com/photo-1582555172866-f73bb12a2ab3?q=80&w=2000'">
+                      </div>
+                      <!-- Badges -->
+                      <div class="circular-badge shadow-lg d-none d-md-flex">
+                        <div class="text-center">
+                           <div class="fw-1000 fs-4">SALE</div>
+                           <div class="small fw-700">EXCLUSIVE</div>
+                        </div>
+                      </div>
+                   </div>
+                 </div>
+               </div>
+             </div>
+          </section>
+       </div>
+    </div>
+    
+    <!-- Shared Carousel Indicators (Dots Overlay) -->
+    <div class="container position-relative" style="margin-top: -60px; z-index: 20;">
+       <div class="carousel-dots d-flex justify-content-center gap-2">
+          <button *ngFor="let b of banners(); let i = index" 
+                  class="dot-btn shadow-sm" 
+                  [class.active]="i === currentIndex()"
+                  (click)="setBanner(i)"></button>
+       </div>
+    </div>
+  </section>
+
+  <!-- SEARCH FILTER STATUS -->
+  <div class="container mb-4" *ngIf="keyword()">
+     <div class="alert glass-panel d-flex align-items-center justify-content-between py-3 mb-0">
+        <div class="d-flex align-items-center gap-3">
+           <div class="icon-circle bg-primary text-white"><i class="fa-solid fa-magnifying-glass"></i></div>
+           <div>
+              <span class="text-muted small">Kết quả tìm kiếm cho:</span>
+              <h5 class="mb-0 fw-700">"{{ keyword() }}"</h5>
+           </div>
         </div>
-        <div class="card-body p-3 bg-white border-top border-light shadow-sm">
-          <h6 class="card-title fw-bold text-truncate mb-1" style="color: #1e1e2d; font-size: 0.95rem;">{{ product.name }}</h6>
-          <p class="card-text text-muted small text-truncate-2 mb-2" style="min-height: 32px; font-size: 0.8rem;">
-            {{ product.description }}
-          </p>
-          <div class="d-flex justify-content-between align-items-center">
-            <span class="fw-bold text-primary" style="font-size: 0.9rem;">{{ product.price | currency:'VND':'symbol':'1.0-0' }}</span>
+        <button class="btn btn-sm btn-outline-secondary rounded-pill px-3" (click)="keyword.set(''); getProducts()">Xóa</button>
+     </div>
+  </div>
+
+  <!-- PHOTO FRAME DYNAMIC CLASSIFICATIONS -->
+  <section class="container mb-5">
+     <div class="row g-3 justify-content-center">
+        <!-- 'All' Pill -->
+        <div class="col-6 col-md-3 col-lg-2">
+           <div class="cat-pill" [class.active]="categoryId() === 0" (click)="selectCategory(0)">
+              <div class="icon bg-indigo"><i class="fa-solid fa-layer-group"></i></div>
+              <span>Tất cả</span>
+           </div>
+        </div>
+        
+        <!-- Dynamic Category Pills -->
+        @for (cat of categories(); track cat.id) {
+           <div class="col-6 col-md-3 col-lg-2">
+              <div class="cat-pill" [class.active]="categoryId() === cat.id" (click)="selectCategory(cat.id)">
+                 <div class="icon" [ngClass]="{
+                    'bg-pink': cat.id % 4 === 1,
+                    'bg-amber': cat.id % 4 === 2,
+                    'bg-teal': cat.id % 4 === 3,
+                    'bg-indigo': cat.id % 4 === 0
+                 }">
+                    <i class="fa-solid" [ngClass]="{
+                       'fa-tree': cat.name.toLowerCase().includes('gỗ'),
+                       'fa-gem': !cat.name.toLowerCase().includes('gỗ') && cat.id % 2 === 0,
+                       'fa-wand-sparkles': !cat.name.toLowerCase().includes('gỗ') && cat.id % 2 !== 0
+                    }"></i>
+                 </div>
+                 <span>{{ cat.name }}</span>
+              </div>
+           </div>
+        }
+     </div>
+  </section>
+
+  <!-- PRODUCT GRID -->
+  <section class="container mb-5">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+       <div>
+          <h2 class="fw-800 tracking-tight mb-0">Mẫu Khung Ảnh Hot</h2>
+          <div class="title-underline"></div>
+       </div>
+       <button class="btn btn-link text-indigo text-decoration-none fw-700">Xem tất cả <i class="fa-solid fa-chevron-right ms-1"></i></button>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="products().length === 0" class="text-center py-5">
+       <div class="mb-4 opacity-20"><i class="fa-solid fa-box-open display-1"></i></div>
+       <h4 class="text-muted">Không tìm thấy sản phẩm nào phù hợp</h4>
+       <button class="btn btn-brand rounded-pill mt-3" (click)="keyword.set(''); categoryId.set(0); getProducts()">Xem lại tất cả</button>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-6 col-md-4 col-lg-3" *ngFor="let product of products()">
+        <div class="glass-product-card rounded-4 p-0 h-100" (click)="goToDetail(product.id)">
+          <div class="card-media position-relative rounded-4 overflow-hidden mb-3">
+             <img [src]="getImageUrl(product.thumbnail)" 
+                  class="img-fluid product-img w-100 h-100 object-fit-cover" 
+                  [alt]="product.name">
+             
+             <!-- Badges & actions -->
+             <div class="status-badge bg-white shadow-sm fw-bold">Best Seller</div>
+             <button class="btn-wishlist shadow-sm"><i class="fa-regular fa-heart"></i></button>
+             
+             <div class="media-overlay">
+                <button class="btn-quick-add fw-bold shadow-lg">Chi tiết</button>
+             </div>
+          </div>
+          <div class="p-3 pt-0">
+             <div class="text-muted small mb-1">{{ product.category_name || 'Khung Ảnh' }}</div>
+             <h6 class="fw-800 text-dark mb-2 text-truncate">{{ product.name }}</h6>
+             <div class="d-flex align-items-center justify-content-between">
+                <span class="text-indigo fw-800 fs-5">{{ product.price | currency:'VND':'symbol':'1.0-0' }}</span>
+                <div class="rating small text-amber"><i class="fa-solid fa-star me-1"></i>4.9</div>
+             </div>
           </div>
         </div>
       </div>
     </div>
-    }
 
-    @if (products().length === 0) {
-      <div class="col-12 text-center py-5 no-products-found">
-        <i class="fa-solid fa-box-open fs-1 mb-3"></i>
-        <h4>Không tìm thấy sản phẩm nào.</h4>
-      </div>
-    }
-  </div>
-
-  <!-- Glassmorphism Pagination (Centered & Compact) -->
-  @if (totalPages() > 1) {
-  <div class="mt-5 pt-3 divider-top">
-    <nav class="d-flex justify-content-center">
-      <ul class="pagination pagination-glass mb-0">
-        <!-- First Page -->
+    <!-- Pagination -->
+    <nav *ngIf="totalPages() > 1" class="mt-5 d-flex justify-content-center">
+      <ul class="pagination gap-2 border-0">
         <li class="page-item" [class.disabled]="currentPage() === 0">
-          <a class="page-link rounded-pill border-0 me-1" 
-             style="width: 36px; height: 36px; cursor: pointer;"
-             (click)="onPageChange(0)">
-             <i class="fa-solid fa-angles-left small"></i>
-          </a>
+          <button class="page-link rounded-circle border-0 shadow-sm" (click)="onPageChange(currentPage() - 1)">
+             <i class="fa-solid fa-chevron-left"></i>
+          </button>
         </li>
-        
-        <!-- Previous -->
-        <li class="page-item" [class.disabled]="currentPage() === 0">
-          <a class="page-link rounded-pill border-0 me-2" 
-             style="width: 36px; height: 36px; cursor: pointer;"
-             (click)="onPageChange(currentPage() - 1)">
-             <i class="fa-solid fa-chevron-left small"></i>
-          </a>
+        <li class="page-item" *ngFor="let page of getPagesArray()" [class.active]="page === currentPage()">
+          <button class="page-link rounded-circle border-0 shadow-sm fw-700" (click)="onPageChange(page)">{{ page + 1 }}</button>
         </li>
-        
-        @for (i of getPagesArray(); track i) {
-        <li class="page-item" [class.active]="i === currentPage()">
-          <a class="page-link rounded-pill border-0 mx-1"
-             style="width: 36px; height: 36px; cursor: pointer; font-size: 0.9rem;"
-             (click)="onPageChange(i)">
-             {{ i + 1 }}
-          </a>
-        </li>
-        }
-
-        <!-- Next -->
         <li class="page-item" [class.disabled]="currentPage() === totalPages() - 1">
-          <a class="page-link rounded-pill border-0 ms-2"
-             style="width: 36px; height: 36px; cursor: pointer;"
-             (click)="onPageChange(currentPage() + 1)">
-             <i class="fa-solid fa-chevron-right small"></i>
-          </a>
-        </li>
-
-        <!-- Last Page -->
-        <li class="page-item" [class.disabled]="currentPage() === totalPages() - 1">
-          <a class="page-link rounded-pill border-0 ms-1"
-             style="width: 36px; height: 36px; cursor: pointer;"
-             (click)="onPageChange(totalPages() - 1)">
-             <i class="fa-solid fa-angles-right small"></i>
-          </a>
+          <button class="page-link rounded-circle border-0 shadow-sm" (click)="onPageChange(currentPage() + 1)">
+             <i class="fa-solid fa-chevron-right"></i>
+          </button>
         </li>
       </ul>
     </nav>
-  </div>
-  }
-</div>
+  </section>
+</main>
+
 <app-footer></app-footer>

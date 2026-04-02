@@ -10,35 +10,44 @@ import { ToastService } from '../../service/toast.service';
   standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
-    <div class="card border-0 shadow-sm rounded-4 overflow-hidden" style="background: white;">
-      <div class="card-header bg-white border-bottom p-4 d-flex justify-content-between align-items-center">
-        <h4 class="mb-0 fw-bold">Quản Lý Danh Mục</h4>
-        <button class="btn btn-primary rounded-pill fw-bold shadow-sm px-4" (click)="openAddModal()">
-          <i class="fa-solid fa-plus me-2"></i>Thêm Danh Mục
+    <div class="row mb-4 align-items-center">
+      <div class="col-md-6">
+        <h2 class="fw-800 text-dark mb-1">Quản Lý Danh Mục</h2>
+        <p class="text-muted small mb-0">Tổ chức và quản lý các nhóm sản phẩm của bạn</p>
+      </div>
+      <div class="col-md-6 text-md-end mt-3 mt-md-0">
+        <button class="btn btn-brand-lg rounded-4 fw-bold shadow-brand px-4 py-3" (click)="openAddModal()">
+          <i class="fa-solid fa-plus me-2"></i>Thêm Danh Mục Mới
         </button>
       </div>
-      
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
       <div class="card-body p-0">
         <div class="table-responsive">
-          <table class="table table-hover align-middle mb-0">
-            <thead class="bg-light">
+          <table class="table table-custom align-middle mb-0">
+            <thead>
               <tr>
-                <th scope="col" class="ps-4 py-3 text-secondary text-uppercase small fw-bold">ID</th>
-                <th scope="col" class="py-3 text-secondary text-uppercase small fw-bold">Tên Danh Mục</th>
-                <th scope="col" class="py-3 text-secondary text-uppercase small fw-bold text-end pe-4">Thao tác</th>
+                <th scope="col" class="ps-4">ID</th>
+                <th scope="col">Tên Danh Mục</th>
+                <th scope="col" class="text-end pe-4">Thao tác</th>
               </tr>
             </thead>
             <tbody>
               @for (category of categories(); track category.id) {
-              <tr style="transition: all 0.2s ease;">
-                <td class="ps-4 fw-medium text-muted">#{{ category.id }}</td>
-                <td class="fw-bold text-dark">{{ category.name }}</td>
+              <tr>
+                <td class="ps-4">
+                  <span class="badge bg-light text-muted rounded-pill px-3 py-2">#{{ category.id }}</span>
+                </td>
+                <td>
+                  <div class="fw-bold text-dark fs-6">{{ category.name }}</div>
+                </td>
                 <td class="text-end pe-4">
-                  <div class="btn-group shadow-sm rounded-pill">
-                    <button class="btn btn-light text-primary py-2 px-3 border-secondary border-opacity-25" (click)="openEditModal(category)" title="Chỉnh sửa">
+                  <div class="action-btns d-inline-flex gap-2">
+                    <button class="btn btn-icon-sm btn-edit shadow-sm" (click)="openEditModal(category)" title="Chỉnh sửa">
                       <i class="fa-solid fa-pen-to-square"></i>
                     </button>
-                    <button class="btn btn-light text-danger py-2 px-3 border-secondary border-opacity-25" (click)="deleteCategory(category.id)" title="Xóa">
+                    <button class="btn btn-icon-sm btn-delete shadow-sm" (click)="deleteCategory(category.id)" title="Xóa">
                       <i class="fa-solid fa-trash-can"></i>
                     </button>
                   </div>
@@ -51,40 +60,182 @@ import { ToastService } from '../../service/toast.service';
       </div>
     </div>
 
-    <!-- Modal (Overlay simple custom) -->
+    <!-- Modern Modal Container -->
     @if (showModal()) {
-    <div class="modal-overlay d-flex align-items-center justify-content-center">
-      <div class="modal-card bg-white rounded-4 shadow-lg p-5" style="width: 450px;">
-        <h3 class="fw-bold mb-4">{{ modalTitle() }}</h3>
-        <div class="mb-4">
-          <label class="form-label text-muted small text-uppercase fw-bold">Tên danh mục</label>
-          <input type="text" class="form-control form-control-lg bg-light border-0 shadow-sm rounded-3" 
-                 [(ngModel)]="categoryForm.name" placeholder="Nhập tên...">
+    <div class="modal-backdrop-custom d-flex align-items-center justify-content-center p-3">
+      <div class="modal-container-custom bg-white shadow-2xl rounded-5 p-4 p-md-5 overflow-hidden position-relative">
+        <!-- Close Button -->
+        <button class="btn-close-custom position-absolute top-0 end-0 m-4" (click)="closeModal()">
+           <i class="fa-solid fa-xmark"></i>
+        </button>
+
+        <div class="modal-header-custom mb-4">
+           <div class="icon-shape bg-primary-soft text-primary mb-3">
+              <i class="fa-solid fa-layer-group fs-4"></i>
+           </div>
+           <h3 class="fw-800 text-dark mb-1">{{ modalTitle() }}</h3>
+           <p class="text-muted small">Thông tin danh mục sản phẩm</p>
         </div>
-        <div class="d-flex justify-content-end gap-3">
-          <button class="btn btn-light rounded-pill px-4 fw-bold" (click)="closeModal()">Hủy</button>
-          <button class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm" (click)="saveCategory()">Lưu Lại</button>
+
+        <div class="modal-body-custom mb-5">
+          <div class="form-group-custom">
+            <label class="form-label text-dark fw-700 small mb-2">Tên danh mục <span class="text-danger">*</span></label>
+            <div class="input-group-custom">
+               <i class="fa-solid fa-tag text-muted"></i>
+               <input type="text" class="form-control-custom" 
+                      [(ngModel)]="categoryForm.name" placeholder="Ví dụ: Điện tử, Thời trang...">
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer-custom d-flex gap-3">
+          <button class="btn btn-light-lg rounded-4 px-4 flex-grow-1 fw-bold" (click)="closeModal()">Hủy</button>
+          <button class="btn btn-brand-lg rounded-4 px-4 flex-grow-1 fw-bold shadow-brand" (click)="saveCategory()">
+            <i class="fa-solid fa-check me-2"></i>Lưu Lại
+          </button>
         </div>
       </div>
     </div>
     }
   `,
   styles: [`
-    .modal-overlay {
+    .fw-800 { font-weight: 800; }
+    .fw-700 { font-weight: 700; }
+
+    /* Button Styling */
+    .btn-brand-lg {
+       background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+       color: white;
+       border: none;
+       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .btn-brand-lg:hover {
+       transform: translateY(-2px);
+       box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
+       color: white;
+    }
+    .shadow-brand { box-shadow: 0 4px 14px 0 rgba(99, 102, 241, 0.3); }
+
+    .btn-light-lg {
+       background: #f1f5f9;
+       border: 1px solid #e2e8f0;
+       color: #475569;
+       transition: all 0.2s;
+    }
+    .btn-light-lg:hover { background: #e2e8f0; color: #1e293b; }
+
+    /* Table Styling */
+    .table-custom { border-collapse: separate; border-spacing: 0 8px; margin-top: -8px; }
+    .table-custom thead th {
+       background: transparent;
+       border-bottom: none;
+       color: #64748b;
+       text-transform: uppercase;
+       font-size: 0.75rem;
+       font-weight: 700;
+       letter-spacing: 0.5px;
+       padding: 1.5rem 1rem;
+    }
+    .table-custom tbody tr {
+       background: white;
+       transition: all 0.2s;
+       cursor: pointer;
+    }
+    .table-custom tbody tr:hover {
+       background: #f8fafc;
+       transform: scale(1.002);
+    }
+    .table-custom tbody td {
+       border-top: 1px solid #f1f5f9;
+       border-bottom: 1px solid #f1f5f9;
+       padding: 1.2rem 1rem;
+    }
+    .table-custom tbody td:first-child { border-left: 1px solid #f1f5f9; border-top-left-radius: 12px; border-bottom-left-radius: 12px; }
+    .table-custom tbody td:last-child { border-right: 1px solid #f1f5f9; border-top-right-radius: 12px; border-bottom-right-radius: 12px; }
+
+    /* Action Buttons */
+    .btn-icon-sm {
+       width: 38px;
+       height: 38px;
+       display: flex;
+       align-items: center;
+       justify-content: center;
+       border-radius: 10px;
+       border: none;
+       transition: all 0.2s;
+    }
+    .btn-edit { background: #eff6ff; color: #2563eb; }
+    .btn-edit:hover { background: #2563eb; color: white; }
+    .btn-delete { background: #fef2f2; color: #ef4444; }
+    .btn-delete:hover { background: #ef4444; color: white; }
+
+    /* Modal Styling */
+    .modal-backdrop-custom {
       position: fixed;
       top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.5);
-      z-index: 9999;
-      backdrop-filter: blur(4px);
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(8px);
+      z-index: 2000;
+      animation: fadeIn 0.3s ease;
     }
-    .modal-card {
-      animation: slideUp 0.3s ease-out;
+    .modal-container-custom {
+      width: 100%;
+      max-width: 500px;
+      animation: modalSlideUp 0.4s cubic-bezier(0.19, 1, 0.22, 1);
     }
-    @keyframes slideUp {
-      from { transform: translateY(20px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
+    .icon-shape {
+       width: 56px;
+       height: 56px;
+       border-radius: 16px;
+       display: flex;
+       align-items: center;
+       justify-content: center;
     }
+    .bg-primary-soft { background: #eef2ff; }
+
+    /* Input Custom */
+    .form-control-custom {
+       width: 100%;
+       padding: 14px 16px 14px 44px;
+       border-radius: 14px;
+       border: 1px solid #e2e8f0;
+       background: #f8fafc;
+       font-weight: 500;
+       transition: all 0.3s;
+    }
+    .form-control-custom:focus {
+       background: white;
+       border-color: #6366f1;
+       box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+       outline: none;
+    }
+    .input-group-custom { position: relative; }
+    .input-group-custom i {
+       position: absolute;
+       left: 16px;
+       top: 50%;
+       transform: translateY(-50%);
+       pointer-events: none;
+    }
+
+    .btn-close-custom {
+       background: #f1f5f9;
+       border: none;
+       width: 36px;
+       height: 36px;
+       border-radius: 50%;
+       display: flex;
+       align-items: center;
+       justify-content: center;
+       color: #64748b;
+       transition: all 0.2s;
+    }
+    .btn-close-custom:hover { background: #e2e8f0; color: #0f172a; }
+
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes modalSlideUp { from { transform: translateY(40px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
   `]
+
 })
 export class AdminCategoriesComponent implements OnInit {
   categories = signal<any[]>([]);
