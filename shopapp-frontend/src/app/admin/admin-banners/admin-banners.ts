@@ -29,7 +29,7 @@ import { BannerService } from '../../service/banner.service';
           <div class="banner-card rounded-5 overflow-hidden shadow-sm border border-light bg-white position-relative">
              <div class="banner-img-wrapper position-relative">
                 <img [src]="getImageUrl(banner.image_url)" class="banner-img w-100 object-fit-cover" 
-                     (error)="$event.target.src='https://via.placeholder.com/800x300?text=Banner+Image'">
+                     (error)="$event.target.src='https://placehold.co/800x300?text=XEM+TRUOC+BANNER'">
                 
                 <div class="banner-overlay p-4 d-flex flex-column justify-content-between">
                    <div class="d-flex justify-content-between align-items-start">
@@ -121,7 +121,7 @@ import { BannerService } from '../../service/banner.service';
                       <div class="preview-box p-3 bg-light rounded-4 border">
                          <span class="small fw-800 text-muted d-block mb-2">Xem Trước Banner</span>
                          <div class="preview-img-container rounded-3 overflow-hidden shadow-sm" style="height: 150px; background: #eee">
-                            <img [src]="getImageUrl(currentBanner.image_url)" class="w-100 h-100 object-fit-cover" (error)="$event.target.src='https://via.placeholder.com/800x300?text=Banner+Preview'">
+                            <img [src]="getImageUrl(currentBanner.image_url)" class="w-100 h-100 object-fit-cover" (error)="$event.target.src='https://placehold.co/800x300?text=XEM+TRUOC+BANNER'">
                          </div>
                       </div>
                    </div>
