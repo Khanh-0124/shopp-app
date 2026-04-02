@@ -39,4 +39,14 @@ export class BannerService {
       responseType: 'text' as 'json'
     });
   }
+
+  uploadImage(file: File): Observable<string> {
+    const formData = new FormData();
+    formData.append('file', file);
+    const token = localStorage.getItem('access_token');
+    return this.http.post(`${this.apiUrl}/uploads`, formData, {
+      headers: { 'Authorization': `Bearer ${token}` },
+      responseType: 'text'
+    });
+  }
 }

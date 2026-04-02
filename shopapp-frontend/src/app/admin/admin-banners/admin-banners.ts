@@ -28,7 +28,7 @@ import { BannerService } from '../../service/banner.service';
        <div class="col-lg-6">
           <div class="banner-card rounded-5 overflow-hidden shadow-sm border border-light bg-white position-relative">
              <div class="banner-img-wrapper position-relative">
-                <img [src]="banner.image_url" class="banner-img w-100 object-fit-cover" 
+                <img [src]="getImageUrl(banner.image_url)" class="banner-img w-100 object-fit-cover" 
                      (error)="$event.target.src='https://via.placeholder.com/800x300?text=Banner+Image'">
                 
                 <div class="banner-overlay p-4 d-flex flex-column justify-content-between">
@@ -87,10 +87,18 @@ import { BannerService } from '../../service/banner.service';
              <form #bannerForm="ngForm">
                 <div class="row g-4">
                    <div class="col-12">
-                      <label class="form-label-custom-banner mb-2">Hình ảnh Banner (URL)</label>
-                      <div class="input-group-custom">
+                      <label class="form-label-custom-banner mb-2">Hình ảnh Banner (URL hoặc Upload)</label>
+                      <div class="input-group-custom mb-3">
                          <i class="fa-solid fa-image text-muted"></i>
-                         <input type="text" class="form-control-custom-banner" [(ngModel)]="currentBanner.image_url" name="image_url" placeholder="Nhập đường dẫn URL ảnh banner..." required>
+                         <input type="text" class="form-control-custom-banner" [(ngModel)]="currentBanner.image_url" name="image_url" placeholder="Nhập đường dẫn URL ảnh hoặc..." required>
+                      </div>
+                      
+                      <div class="upload-area p-3 border border-dashed rounded-4 text-center bg-white">
+                         <input type="file" id="fileInput" class="d-none" (change)="onFileSelected($event)" accept="image/*">
+                         <button type="button" class="btn btn-outline-primary rounded-pill px-4" onclick="document.getElementById('fileInput').click()">
+                            <i class="fa-solid fa-cloud-arrow-up me-2"></i>Tải Ảnh Lên Từ Máy Tính
+                         </button>
+                         <p class="small text-muted mt-2 mb-0">Hỗ trợ JPG, PNG (Tối đa 10MB)</p>
                       </div>
                    </div>
                    
@@ -113,7 +121,7 @@ import { BannerService } from '../../service/banner.service';
                       <div class="preview-box p-3 bg-light rounded-4 border">
                          <span class="small fw-800 text-muted d-block mb-2">Xem Trước Banner</span>
                          <div class="preview-img-container rounded-3 overflow-hidden shadow-sm" style="height: 150px; background: #eee">
-                            <img [src]="currentBanner.image_url" class="w-100 h-100 object-fit-cover" (error)="$event.target.src='https://via.placeholder.com/800x300?text=Banner+Preview'">
+                            <img [src]="getImageUrl(currentBanner.image_url)" class="w-100 h-100 object-fit-cover" (error)="$event.target.src='https://via.placeholder.com/800x300?text=Banner+Preview'">
                          </div>
                       </div>
                    </div>
@@ -142,10 +150,7 @@ import { BannerService } from '../../service/banner.service';
     
     .banner-card {
        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-       &:hover {
-          transform: translateY(-8px);
-          box-shadow: 0 20px 40px rgba(0,0,0,0.08) !important;
-       }
+       &:hover { transform: translateY(-8px); box-shadow: 0 20px 40px rgba(0,0,0,0.08) !important; }
     }
 
     .banner-img-wrapper {
@@ -167,10 +172,7 @@ import { BannerService } from '../../service/banner.service';
        &:hover { transform: scale(1.1); }
     }
 
-    .form-label-custom-banner {
-       font-weight: 800; color: #475569; font-size: 0.8rem; text-transform: uppercase;
-    }
-    
+    .form-label-custom-banner { font-weight: 800; color: #475569; font-size: 0.8rem; text-transform: uppercase; }
     .form-control-custom-banner {
        width: 100%; padding: 14px 18px; border-radius: 14px; border: 1px solid #e2e8f0;
        background: #f8fafc; font-weight: 600; transition: all 0.3s;
@@ -184,6 +186,7 @@ import { BannerService } from '../../service/banner.service';
     .modal-backdrop { background-color: rgba(15, 23, 42, 0.6); backdrop-filter: blur(8px); }
     .animate-zoom { animation: zoomIn 0.3s ease-out; }
     @keyframes zoomIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+    .border-dashed { border-style: dashed !important; }
   `]
 })
 export class AdminBannersComponent implements OnInit {
@@ -204,6 +207,25 @@ export class AdminBannersComponent implements OnInit {
       next: (res) => this.banners.set(res),
       error: (err) => this.toastService.error('Lỗi khi tải danh sách banner!')
     });
+  }
+
+  onFileSelected(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      this.bannerService.uploadImage(file).subscribe({
+        next: (filename) => {
+          this.currentBanner.image_url = filename;
+          this.toastService.success('Đã tải ảnh lên thành công!');
+        },
+        error: (err) => this.toastService.error('Lỗi khi tải ảnh lên!')
+      });
+    }
+  }
+
+  getImageUrl(url: string | null): string {
+    if (!url) return 'https://via.placeholder.com/800x300?text=No+Image';
+    if (url.startsWith('http')) return url;
+    return `http://localhost:8088/api/v1/banners/images/${url}`;
   }
 
   openAddModal() {
