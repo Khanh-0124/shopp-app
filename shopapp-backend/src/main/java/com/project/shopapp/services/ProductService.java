@@ -57,39 +57,36 @@ public class ProductService implements IProductService{
     }
 
     private void saveVariants(Product product, ProductDTO productDTO) {
-        // 1. Save Attributes and Values and keep them in a map for lookup
-        java.util.Map<String, ProductAttributeValue> valueMap = new java.util.HashMap<>();
-        
-        System.out.println("Processing Variants. HasVariants: " + productDTO.getHasVariants());
-        if (productDTO.getAttributeGroups() == null) System.out.println("DEBUG: attributeGroups is NULL");
-        else System.out.println("DEBUG: attributeGroups count: " + productDTO.getAttributeGroups().size());
-        
-        if (productDTO.getVariants() == null) System.out.println("DEBUG: variants is NULL");
-        else System.out.println("DEBUG: variants count: " + productDTO.getVariants().size());
-
         if (productDTO.getAttributeGroups() == null || productDTO.getVariants() == null) {
+            System.out.println("DEBUG: Missing attributes or variants in DTO, skipping saveVariants.");
             return;
         }
+
+        // 1. Lưu Attributes và Values
+        java.util.Map<String, ProductAttributeValue> valueMap = new java.util.HashMap<>();
         
         for (ProductDTO.AttributeGroupDTO groupDTO : productDTO.getAttributeGroups()) {
+            if (groupDTO.getName() == null || groupDTO.getName().trim().isEmpty()) continue;
+            
             ProductAttribute attribute = ProductAttribute.builder()
                     .product(product)
                     .name(groupDTO.getName())
                     .build();
-            attributeRepository.save(attribute);
+            attribute = attributeRepository.save(attribute);
 
             for (String value : groupDTO.getValues()) {
+                if (value == null || value.trim().isEmpty()) continue;
+                
                 ProductAttributeValue attributeValue = ProductAttributeValue.builder()
                         .attribute(attribute)
                         .value(value)
                         .build();
-                attributeValueRepository.save(attributeValue);
-                // Key is GroupName + Value
+                attributeValue = attributeValueRepository.save(attributeValue);
                 valueMap.put(groupDTO.getName() + "|" + value, attributeValue);
             }
         }
 
-        // 2. Save Variants
+        // 2. Lưu Variants
         for (ProductDTO.VariantDTO variantDTO : productDTO.getVariants()) {
             ProductVariant variant = ProductVariant.builder()
                     .product(product)
@@ -99,16 +96,20 @@ public class ProductService implements IProductService{
                     .build();
             
             java.util.List<ProductAttributeValue> variantValues = new java.util.ArrayList<>();
-            // Map combination to actual AttributeValue entities using index or map
-            for (int i = 0; i < variantDTO.getCombination().size(); i++) {
-                String valName = variantDTO.getCombination().get(i);
-                String groupName = productDTO.getAttributeGroups().get(i).getName();
-                ProductAttributeValue av = valueMap.get(groupName + "|" + valName);
-                if (av != null) variantValues.add(av);
+            if (variantDTO.getCombination() != null) {
+                for (int i = 0; i < variantDTO.getCombination().size(); i++) {
+                    String valName = variantDTO.getCombination().get(i);
+                    if (i < productDTO.getAttributeGroups().size()) {
+                        String groupName = productDTO.getAttributeGroups().get(i).getName();
+                        ProductAttributeValue av = valueMap.get(groupName + "|" + valName);
+                        if (av != null) variantValues.add(av);
+                    }
+                }
             }
             variant.setAttributeValues(variantValues);
             variantRepository.save(variant);
         }
+        System.out.println("DEBUG: saveVariants completed for product ID: " + product.getId());
     }
 
     @Override
