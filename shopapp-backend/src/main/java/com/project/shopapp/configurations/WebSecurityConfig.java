@@ -37,21 +37,18 @@ public class WebSecurityConfig {
                 .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(requests -> {
                     requests
-                            .requestMatchers(
-                                    String.format("/%s/users/register", apiPrefix),
-                                    String.format("/%s/users/login", apiPrefix)
-                            ).permitAll()
+                            .requestMatchers(GET, "/api/v1/products/images/**").permitAll()
+                            .requestMatchers(GET, "/api/v1/banners/**").permitAll()
+                            .requestMatchers(GET, "/api/v1/categories/**").permitAll()
+                            .requestMatchers(GET, "/api/v1/products/**").permitAll()
+                            .requestMatchers(GET, "/api/v1/roles/**").permitAll()
 
-                            .requestMatchers(GET, String.format("/%s/roles**", apiPrefix)).permitAll()
-                            .requestMatchers(GET, String.format("/%s/categories**", apiPrefix)).permitAll()
-                            .requestMatchers(GET, String.format("/%s/categories/**", apiPrefix)).permitAll()
+                            .requestMatchers(POST, String.format("/%s/users/register", apiPrefix)).permitAll()
+                            .requestMatchers(POST, String.format("/%s/users/login", apiPrefix)).permitAll()
                             
                             .requestMatchers(POST, String.format("/%s/categories/**", apiPrefix)).hasAnyRole(Role.ADMIN)
                             .requestMatchers(PUT, String.format("/%s/categories/**", apiPrefix)).hasAnyRole(Role.ADMIN)
                             .requestMatchers(DELETE, String.format("/%s/categories/**", apiPrefix)).hasAnyRole(Role.ADMIN)
-
-                            .requestMatchers(GET, String.format("/%s/products/images/**", apiPrefix)).permitAll()
-                            .requestMatchers(GET, String.format("/%s/products/**", apiPrefix)).permitAll()
 
                             .requestMatchers(POST, String.format("/%s/products**", apiPrefix)).hasAnyRole(Role.ADMIN)
                             .requestMatchers(PUT, String.format("/%s/products/**", apiPrefix)).hasAnyRole(Role.ADMIN)
@@ -65,12 +62,6 @@ public class WebSecurityConfig {
                             .requestMatchers(POST, String.format("/%s/order_details/**", apiPrefix)).hasAnyRole(Role.USER)
                             .requestMatchers(GET, String.format("/%s/order_details/**", apiPrefix)).permitAll()
                             
-                            .requestMatchers(GET, 
-                                    String.format("/%s/banners", apiPrefix),
-                                    String.format("/%s/banners**", apiPrefix),
-                                    String.format("/%s/banners/**", apiPrefix),
-                                    String.format("/%s/banners/active", apiPrefix)).permitAll()
-                                    
                             .requestMatchers(POST, String.format("/%s/banners/**", apiPrefix)).hasAnyRole(Role.ADMIN)
                             .requestMatchers(PUT, String.format("/%s/banners/**", apiPrefix)).hasAnyRole(Role.ADMIN)
                             .requestMatchers(DELETE, String.format("/%s/banners/**", apiPrefix)).hasAnyRole(Role.ADMIN)
