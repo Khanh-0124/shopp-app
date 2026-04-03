@@ -123,7 +123,7 @@ public class ProductController {
         }
     }
 
-    @GetMapping("/images/{imageName}")
+    @GetMapping("/images/{imageName:.+}")
     public ResponseEntity<?> viewImage(@PathVariable String imageName) {
         try {
             java.nio.file.Path imagePath = Paths.get("uploads/"+imageName);

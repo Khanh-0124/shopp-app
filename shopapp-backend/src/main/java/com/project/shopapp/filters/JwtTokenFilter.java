@@ -9,7 +9,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.util.Pair;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -18,12 +17,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.*;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
 
 @Component
 @RequiredArgsConstructor
-
 public class JwtTokenFilter extends OncePerRequestFilter{
     @Value("${api.prefix}")
     private String apiPrefix;
@@ -56,7 +52,7 @@ public class JwtTokenFilter extends OncePerRequestFilter{
                 if(jwtTokenUtil.validateToken(token, userDetails)) {
                     UsernamePasswordAuthenticationToken authenticationToken =
                             new UsernamePasswordAuthenticationToken(
-                                    userDetails,
+                                     userDetails,
                                     null,
                                     userDetails.getAuthorities()
                             );
@@ -71,22 +67,27 @@ public class JwtTokenFilter extends OncePerRequestFilter{
 
     }
     private boolean isBypassToken(@NonNull  HttpServletRequest request) {
+        final String servletPath = request.getServletPath();
+        final String method = request.getMethod();
 
-        final List<Pair<String, String>> bypassTokens = Arrays.asList(
-                Pair.of(String.format("%s/roles", apiPrefix), "GET"),
-                Pair.of(String.format("%s/products", apiPrefix), "GET"),
-                Pair.of(String.format("%s/orders", apiPrefix), "GET"),
-                Pair.of(String.format("%s/categories", apiPrefix), "GET"),
-                Pair.of(String.format("%s/banners", apiPrefix), "GET"),
-                Pair.of(String.format("%s/users/register", apiPrefix), "POST"),
-                Pair.of(String.format("%s/users/login", apiPrefix), "POST")
-        );
-        for(Pair<String, String> bypassToken: bypassTokens) {
-            if (request.getServletPath().contains(bypassToken.getFirst()) &&
-                    request.getMethod().equals(bypassToken.getSecond())) {
-                return true;
-            }
+        if (method.equals("GET") && (
+                servletPath.contains(String.format("/%s/products/images", apiPrefix)) ||
+                servletPath.contains(String.format("/%s/banners", apiPrefix)) ||
+                servletPath.contains(String.format("/%s/roles", apiPrefix)) ||
+                servletPath.contains(String.format("/%s/categories", apiPrefix)) ||
+                servletPath.contains(String.format("/%s/products", apiPrefix)) ||
+                servletPath.contains(String.format("/%s/orders", apiPrefix))
+        )) {
+            return true;
         }
+
+        if (method.equals("POST") && (
+                servletPath.contains(String.format("/%s/users/register", apiPrefix)) ||
+                servletPath.contains(String.format("/%s/users/login", apiPrefix))
+        )) {
+            return true;
+        }
+
         return false;
     }
 }
