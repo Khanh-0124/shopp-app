@@ -36,13 +36,16 @@ public class WebSecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class)
+                .cors(Customizer.withDefaults()) // Use the bean below
+                .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(requests -> {
                     requests
-                            .requestMatchers(GET, "/api/v1/products/images/**").permitAll()
-                            .requestMatchers(GET, "/api/v1/banners/**").permitAll()
-                            .requestMatchers(GET, "/api/v1/categories/**").permitAll()
+                            .requestMatchers(OPTIONS, "/**").permitAll() // Cho phép tất cả lệnh OPTIONS
                             .requestMatchers(GET, "/api/v1/products/**").permitAll()
+                            .requestMatchers(GET, "/api/v1/categories/**").permitAll()
+                            .requestMatchers(GET, "/api/v1/banners/**").permitAll()
                             .requestMatchers(GET, "/api/v1/roles/**").permitAll()
+                            .requestMatchers(GET, "/api/v1/products/images/**").permitAll()
 
                             .requestMatchers(POST, String.format("/%s/users/register", apiPrefix)).permitAll()
                             .requestMatchers(POST, String.format("/%s/users/login", apiPrefix)).permitAll()
@@ -55,25 +58,10 @@ public class WebSecurityConfig {
                             .requestMatchers(PUT, String.format("/%s/products/**", apiPrefix)).hasAnyRole(Role.ADMIN)
                             .requestMatchers(DELETE, String.format("/%s/products/**", apiPrefix)).hasAnyRole(Role.ADMIN)
 
-                            .requestMatchers(POST, String.format("/%s/orders/**", apiPrefix)).hasAnyRole(Role.ADMIN)
+                            .requestMatchers(POST, String.format("/%s/orders/**", apiPrefix)).permitAll()
                             .requestMatchers(GET, String.format("/%s/orders/**", apiPrefix)).permitAll()
-                            .requestMatchers(PUT, String.format("/%s/orders/**", apiPrefix)).hasRole(Role.ADMIN)
-                            .requestMatchers(DELETE, String.format("/%s/orders/**", apiPrefix)).hasRole(Role.ADMIN)
-
-                            .requestMatchers(POST, String.format("/%s/order_details/**", apiPrefix)).hasAnyRole(Role.USER)
-                            .requestMatchers(GET, String.format("/%s/order_details/**", apiPrefix)).permitAll()
-                            
-                            .requestMatchers(POST, String.format("/%s/banners/**", apiPrefix)).hasAnyRole(Role.ADMIN)
-                            .requestMatchers(PUT, String.format("/%s/banners/**", apiPrefix)).hasAnyRole(Role.ADMIN)
-                            .requestMatchers(DELETE, String.format("/%s/banners/**", apiPrefix)).hasAnyRole(Role.ADMIN)
-
-                            .requestMatchers(PUT, String.format("/%s/order_details/**", apiPrefix)).hasRole(Role.ADMIN)
-                            .requestMatchers(DELETE, String.format("/%s/order_details/**", apiPrefix)).hasRole(Role.ADMIN)
-
                             .anyRequest().authenticated();
-                })
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .csrf(AbstractHttpConfigurer::disable);
+                });
 
         return http.build();
     }
@@ -81,7 +69,7 @@ public class WebSecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOriginPatterns(List.of("*"));
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:4200", "http://localhost:4300", "https://shopp-app-production.up.railway.app"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("authorization", "content-type", "x-auth-token", "origin", "accept"));
         configuration.setExposedHeaders(List.of("x-auth-token"));
