@@ -37,38 +37,38 @@ export class DetailProductComponent implements OnInit {
     if (id) {
       this.productService.getProductById(Number(id)).subscribe({
         next: (response) => {
-          console.log('--- DEBUG: FULL PRODUCT DATA FROM API ---');
-          console.log(response);
-          console.log('-----------------------------------------');
+          console.log('>>> [DEBUG] DATA GỐC:', response);
           
-          // Đồng bộ hóa has_variants để HTML nhận diện đúng
+          // Chuẩn hóa dữ liệu Attributes để HTML luôn đọc được .name và .values
+          if (response.attributes) {
+            response.attributes = response.attributes.map((attr: any) => ({
+              name: attr.name || attr.attribute_name || 'Phân loại',
+              values: attr.values || attr.attribute_values || []
+            }));
+          }
+
+          // Chuẩn hóa has_variants
           response.has_variants = response.has_variants || response.hasVariants || (response.attributes && response.attributes.length > 0);
           
           this.product.set(response);
           this.calculateInitialPrice(response);
           
-          // --- LOGIC CỨU HỘ DỮ LIỆU ---
-          // Nếu attributes bị rỗng nhưng có variants, ta tự tạo attributes để hiện nút bấm
+          // --- LOGIC CỨU HỘ ---
           if (response.has_variants && (!response.attributes || response.attributes.length === 0) && response.variants && response.variants.length > 0) {
-              console.warn('Backend returned empty attributes. Attempting to reconstruct from variants...');
               const reconstructedAttrs: any[] = [];
               const numAttrs = response.variants[0].combination.length;
-              
               for (let i = 0; i < numAttrs; i++) {
                   const values = Array.from(new Set(response.variants.map((v: any) => v.combination[i])));
-                  reconstructedAttrs.push({
-                      name: `Lựa chọn ${i + 1}`, // Fallback name
-                      values: values
-                  });
+                  reconstructedAttrs.push({ name: `Lựa chọn ${i + 1}`, values: values });
               }
               response.attributes = reconstructedAttrs;
           }
-          // ----------------------------
           
-          document.body.scrollTop = 0; // Scroll to top
+          console.log('>>> [DEBUG] DATA SAU CHUẨN HÓA:', response);
+          document.body.scrollTop = 0;
         },
         error: (err) => {
-          console.error('Lỗi khi tải chi tiết sản phẩm', err);
+          console.error('!!! [ERROR] Lỗi khi tải chi tiết sản phẩm:', err);
         }
       });
     }
@@ -76,10 +76,11 @@ export class DetailProductComponent implements OnInit {
 
   calculateInitialPrice(product: any) {
     const hasVariants = product.has_variants || product.hasVariants;
-    console.log('Calculating price. Has Variants:', hasVariants, 'Variants Count:', product.variants?.length);
+    console.log('>>> [DEBUG] calculateInitialPrice - hasVariants:', hasVariants);
     
     if (hasVariants && product.variants && product.variants.length > 0) {
       const prices = product.variants.map((v: any) => v.price).filter((p: any) => p > 0);
+      console.log('>>> [DEBUG] calculateInitialPrice - Variants prices:', prices);
       if (prices.length > 0) {
         this.minPrice.set(Math.min(...prices));
       } else {
@@ -88,9 +89,11 @@ export class DetailProductComponent implements OnInit {
     } else {
       this.minPrice.set(product.price);
     }
+    console.log('>>> [DEBUG] calculateInitialPrice - Final minPrice:', this.minPrice());
   }
 
   selectAttribute(groupName: string, value: string) {
+    console.log(`>>> [DEBUG] selectAttribute: ${groupName} = ${value}`);
     this.selectedAttributes[groupName] = value;
     this.findMatchingVariant();
   }
@@ -101,7 +104,9 @@ export class DetailProductComponent implements OnInit {
 
     // Check if all attribute groups have a selection
     const allGroupsSelected = product.attributes.every((attr: any) => this.selectedAttributes[attr.name]);
-    
+    console.log('>>> [DEBUG] findMatchingVariant - allGroupsSelected:', allGroupsSelected);
+    console.log('>>> [DEBUG] current selectedAttributes:', this.selectedAttributes);
+
     if (allGroupsSelected) {
       // Find variant where combination matches all selected attributes
       const matchingVariant = product.variants.find((v: any) => {
@@ -109,6 +114,7 @@ export class DetailProductComponent implements OnInit {
           return v.combination[index] === this.selectedAttributes[attr.name];
         });
       });
+      console.log('>>> [DEBUG] findMatchingVariant - matchingVariant found:', matchingVariant);
       this.selectedVariant.set(matchingVariant || null);
     } else {
       this.selectedVariant.set(null);
@@ -121,7 +127,9 @@ export class DetailProductComponent implements OnInit {
 
   getDisplayPrice(): number {
     const variant = this.selectedVariant();
-    return variant ? variant.price : this.minPrice();
+    const price = variant ? variant.price : this.minPrice();
+    // console.log('>>> [DEBUG] getDisplayPrice:', price);
+    return price;
   }
 
   getImageUrl(imageName: string | null): string {

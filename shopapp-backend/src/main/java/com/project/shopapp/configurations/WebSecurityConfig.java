@@ -72,8 +72,8 @@ public class WebSecurityConfig {
 
                             .anyRequest().authenticated();
                 })
-                .csrf(AbstractHttpConfigurer::disable)
-                .cors(Customizer.withDefaults());
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .csrf(AbstractHttpConfigurer::disable);
 
         return http.build();
     }

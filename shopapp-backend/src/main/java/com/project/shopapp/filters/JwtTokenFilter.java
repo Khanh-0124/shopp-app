@@ -17,6 +17,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.*;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -67,31 +69,27 @@ public class JwtTokenFilter extends OncePerRequestFilter{
 
     }
     private boolean isBypassToken(@NonNull HttpServletRequest request) {
-        final String requestURI = request.getRequestURI();
-        final String method = request.getMethod();
+        final List<java.util.AbstractMap.SimpleEntry<String, String>> bypassTokens = Arrays.asList(
+                new java.util.AbstractMap.SimpleEntry<>(String.format("/%s/products", apiPrefix), "GET"),
+                new java.util.AbstractMap.SimpleEntry<>(String.format("/%s/categories", apiPrefix), "GET"),
+                new java.util.AbstractMap.SimpleEntry<>(String.format("/%s/banners", apiPrefix), "GET"),
+                new java.util.AbstractMap.SimpleEntry<>(String.format("/%s/roles", apiPrefix), "GET"),
+                new java.util.AbstractMap.SimpleEntry<>(String.format("/%s/users/login", apiPrefix), "POST"),
+                new java.util.AbstractMap.SimpleEntry<>(String.format("/%s/users/register", apiPrefix), "POST")
+        );
 
-        // Bypass check for GET requests to public resources
-        if (method.equals("GET")) {
-            if (requestURI.contains("/products/images") ||
-                requestURI.contains("/banners") ||
-                requestURI.contains("/roles") ||
-                requestURI.contains("/categories") ||
-                requestURI.contains("/products") ||
-                requestURI.contains("/orders")
-            ) {
+        String requestPath = request.getServletPath();
+        String method = request.getMethod();
+
+        if (requestPath.contains("/images")) {
+            return true;
+        }
+
+        for (java.util.AbstractMap.SimpleEntry<String, String> token : bypassTokens) {
+            if (requestPath.contains(token.getKey()) && method.equalsIgnoreCase(token.getValue())) {
                 return true;
             }
         }
-
-        // Bypass check for login and registration
-        if (method.equals("POST")) {
-            if (requestURI.contains("/users/register") ||
-                requestURI.contains("/users/login")
-            ) {
-                return true;
-            }
-        }
-
         return false;
     }
 }
