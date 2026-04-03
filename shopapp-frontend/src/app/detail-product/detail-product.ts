@@ -7,6 +7,7 @@ import { FooterComponent } from "../footer/footer";
 import { ProductService } from '../service/product.service';
 import { OrderListService } from '../service/order-list.service';
 import { ToastService } from '../service/toast.service';
+import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-detail-product',
@@ -101,9 +102,9 @@ export class DetailProductComponent implements OnInit {
   }
 
   getImageUrl(imageName: string | null): string {
-    if (!imageName || imageName === "") return 'https://via.placeholder.com/800x800?text=No+Image';
+    if (!imageName || imageName === "") return 'https://images.unsplash.com/photo-1560393464-5c69a73c5770?q=80&w=800&h=800&auto=format&fit=crop';
     if (imageName.startsWith('http://') || imageName.startsWith('https://')) return imageName;
-    return `http://localhost:8088/api/v1/products/images/${imageName}`;
+    return `${environment.apiBaseUrl}/products/images/${imageName}`;
   }
 
   getProductImages() {
