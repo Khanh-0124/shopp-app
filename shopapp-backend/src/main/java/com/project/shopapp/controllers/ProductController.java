@@ -10,7 +10,6 @@ import com.project.shopapp.responses.ProductResponse;
 import com.project.shopapp.services.IProductService;
 import com.project.shopapp.utils.MessageKeys;
 import lombok.RequiredArgsConstructor;
-import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -126,32 +125,42 @@ public class ProductController {
     @GetMapping("/images/{imageName:.+}")
     public ResponseEntity<?> viewImage(@PathVariable String imageName) {
         try {
-            // Decode URL-encoded filename (%20 → space, %E2%80%AF → narrow no-break space, v.v.)
+            // 1. Giải mã URL chuẩn
             String decodedImageName = java.net.URLDecoder.decode(imageName, java.nio.charset.StandardCharsets.UTF_8);
-            java.nio.file.Path imagePath = Paths.get("uploads/" + decodedImageName);
-            UrlResource resource = new UrlResource(imagePath.toUri());
+            java.nio.file.Path imagePath = java.nio.file.Paths.get("uploads/" + decodedImageName);
+            org.springframework.core.io.UrlResource resource = new org.springframework.core.io.UrlResource(imagePath.toUri());
+
             if (resource.exists()) {
-                // Tự động xác định content type theo đuôi file
-                String contentType = "image/jpeg";
-                String lower = decodedImageName.toLowerCase();
-                if (lower.endsWith(".png")) contentType = "image/png";
-                else if (lower.endsWith(".gif")) contentType = "image/gif";
-                else if (lower.endsWith(".webp")) contentType = "image/webp";
-                return ResponseEntity.ok()
-                        .contentType(org.springframework.http.MediaType.parseMediaType(contentType))
-                        .body(resource);
-            } else {
-                // Thử tìm file không decode (fallback)
-                java.nio.file.Path rawPath = Paths.get("uploads/" + imageName);
-                UrlResource rawResource = new UrlResource(rawPath.toUri());
-                if (rawResource.exists()) {
-                    return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(rawResource);
-                }
-                return ResponseEntity.notFound().build();
+                return serveResource(decodedImageName, resource);
             }
+
+            // 2. Fallback: Tìm kiếm theo Prefix (Vì Screenshot có thể lệch ký tự unicode khoảng trắng)
+            java.nio.file.Path uploadDir = java.nio.file.Paths.get("uploads");
+            try (java.util.stream.Stream<java.nio.file.Path> stream = java.nio.file.Files.list(uploadDir)) {
+                java.util.Optional<java.nio.file.Path> matchedFile = stream
+                    .filter(path -> path.getFileName().toString().startsWith(imageName.substring(0, Math.min(imageName.length(), 40))))
+                    .findFirst();
+                
+                if (matchedFile.isPresent()) {
+                    org.springframework.core.io.UrlResource fallbackRes = new org.springframework.core.io.UrlResource(matchedFile.get().toUri());
+                    return serveResource(matchedFile.get().getFileName().toString(), fallbackRes);
+                }
+            }
+
+            return org.springframework.http.ResponseEntity.notFound().build();
         } catch (Exception e) {
-            return ResponseEntity.notFound().build();
+            return org.springframework.http.ResponseEntity.notFound().build();
         }
+    }
+
+    private ResponseEntity<?> serveResource(String filename, org.springframework.core.io.UrlResource resource) {
+        String contentType = "image/jpeg";
+        String lower = filename.toLowerCase();
+        if (lower.endsWith(".png")) contentType = "image/png";
+        else if (lower.endsWith(".webp")) contentType = "image/webp";
+        return org.springframework.http.ResponseEntity.ok()
+                .contentType(org.springframework.http.MediaType.parseMediaType(contentType))
+                .body(resource);
     }
 
     private String storeFile(MultipartFile file) throws IOException {
