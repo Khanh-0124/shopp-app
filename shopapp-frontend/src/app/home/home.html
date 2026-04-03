@@ -1,83 +1,67 @@
 <app-header></app-header>
 
 <main class="home-modern-wrapper">
-  <!-- HERO SECTION: FULL HORIZONTAL SLIDING CAROUSEL -->
-  <section class="banner-carousel-wrapper mb-5 overflow-hidden" *ngIf="banners().length > 0">
-    <div class="carousel-track d-flex" [style.transform]="'translateX(' + (-currentIndex() * 100) + '%)'"
-      style="transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1); width: 100%;">
+  <!-- HERO SECTION: STATIC POSITION WITH ANIMATED CONTENT -->
+  <section class="banner-carousel-wrapper mb-5 overflow-hidden position-relative" *ngIf="activeBanner()">
+    <div class="hero-slide w-100">
+      <section class="hero-section position-relative overflow-hidden" style="min-height: 480px; background: #fff;">
+        <!-- Subtle Collection Gradient -->
+        <div class="collection-bg-glow"></div>
 
-       <!-- Each Banner Slide -->
-       <div class="hero-slide w-100 flex-shrink-0" *ngFor="let b of banners(); let i = index">
-          <section class="hero-section py-5 position-relative overflow-hidden" 
-                   style="min-height: 75vh; background: #fff;">
-             <!-- Subtle Collection Gradient -->
-             <div class="collection-bg-glow"></div>
-             <!-- Decorative Elements -->
-             <div class="blob blob-1"></div><div class="blob blob-2"></div>
-             
-             <div class="container position-relative z-1 h-100">
-               <div class="row align-items-center justify-content-between h-100">
-                 <div class="col-lg-6 mb-5 mb-lg-0 text-center text-lg-start animate-fade-in-up">
-                   <div class="collection-label mb-3">
-                      <span class="line"></span>
-                      <span class="text fw-800">BỘ SƯU TẬP MỚI 2024</span>
-                   </div>
-                   <h1 class="collection-title display-2 fw-1000 text-dark mb-4 tracking-tight leading-tight">
-                      {{ b.title }}
-                   </h1>
-                   <p class="collection-desc lead text-secondary mb-5 opacity-75 pe-lg-5">
-                      {{ b.sub_title }}
-                   </p>
-                   <div class="d-flex flex-wrap gap-4 justify-content-center justify-content-lg-start">
-                     <button class="btn btn-collection rounded-0 px-5 py-3 fw-bold" [routerLink]="b.link || '/products'">
-                        XEM BỘ SƯU TẬP <i class="fa-solid fa-arrow-right ms-2 mt-1"></i>
-                     </button>
-                     <a href="https://zalo.me/0336969201" target="_blank" class="btn btn-zalo-outline rounded-pill px-4 py-3 d-inline-flex align-items-center text-decoration-none">
-                        <img src="/icons/zalo.svg" alt="Zalo" style="width: 20px; height: 20px; margin-right: 10px;">
-                        <span class="fw-700">Tư vấn trực tiếp</span>
-                     </a>
-                   </div>
-                 </div>
-                 <div class="col-lg-5 col-xl-5">
-                   <div class="collection-media-wrapper position-relative h-100">
-                      <!-- Stacked Background Card -->
-                      <div class="collection-stack-bg shadow-lg"></div>
-                      
-                      <!-- Main Featured Card -->
-                      <div class="collection-main-card shadow-2xl overflow-hidden">
-                        <img [src]="getImageUrl(b.image_url)" 
-                             class="img-fluid w-100 h-100 object-fit-cover" 
-                             alt="Collection item"
-                             (error)="$event.target.src='https://images.unsplash.com/photo-1513519245088-0e12902e35ca?q=80&w=2000'">
-                        
-                        <!-- Floating Glass Info -->
-                        <div class="media-glass-badge p-3 animate-float-slow">
-                           <div class="fw-800 text-indigo fs-5">Hot Pick</div>
-                           <div class="small fw-600 text-muted">Trending Collection</div>
-                        </div>
-                      </div>
+        <div class="container position-relative z-1 h-100">
+          <div class="row align-items-center justify-content-between h-100 py-4">
+            <!-- Animated Text Content -->
+            <div class="col-lg-5 mb-4 mb-lg-0 text-center text-lg-start animate-fade-in-left">
+              <div class="collection-label mb-2">
+                <span class="line"></span>
+                <span class="text fw-800">DISCOVER COLLECTION</span>
+              </div>
+              <h1 class="collection-title-compact fw-1000 text-dark mb-3 tracking-tight">
+                {{ activeBanner().title }}
+              </h1>
+              <p class="collection-desc-compact lead text-secondary mb-4 opacity-75">
+                {{ activeBanner().sub_title }}
+              </p>
+              <div class="d-flex flex-wrap gap-3 justify-content-center justify-content-lg-start">
+                <button class="btn btn-collection rounded-pill px-4 py-2 small fw-bold"
+                  [routerLink]="activeBanner().link || '/products'">
+                  KHÁM PHÁ <i class="fa-solid fa-chevron-right ms-2 mt-1"></i>
+                </button>
+                <a href="https://zalo.me/0336969201" target="_blank"
+                  class="btn btn-zalo-outline rounded-pill px-3 py-2 small d-inline-flex align-items-center text-decoration-none">
+                  <img src="/icons/zalo.svg" alt="Zalo" style="width: 18px; height: 18px; margin-right: 8px;">
+                  <span class="fw-700">033.6969.201</span>
+                </a>
+              </div>
+            </div>
 
-                      <!-- Decorative Floating Badge -->
-                      <div class="luxury-badge shadow-xl">
-                         <div class="inner">
-                            <span class="small">CHỈ CÓ TẠI</span>
-                            <span class="fw-900">SHOPP</span>
-                         </div>
-                      </div>
-                   </div>
-                 </div>
-               </div>
-             </div>
-          </section>
-       </div>
-    </div>
+            <!-- Animated Image Viewport (Pop/Push) -->
+            <div class="col-lg-6">
+              <div class="banner-stack-visualizer position-relative">
+                <!-- Phantom Image Layer (Next in line) -->
+                <div class="next-phantom-layer shadow-lg" *ngIf="banners().length > 1">
+                  <img [src]="getImageUrl(banners()[(currentIndex() + 1) % banners().length].image_url)" 
+                       class="w-100 h-100 object-fit-cover" 
+                       (error)="$event.target.src='https://images.unsplash.com/photo-1513519245088-0e12902e35ca?q=80&w=2000'">
+                </div>
 
-    <!-- Shared Carousel Indicators (Dots Overlay) -->
-    <div class="container position-relative" style="margin-top: -60px; z-index: 20;">
-      <div class="carousel-dots d-flex justify-content-center gap-2">
-        <button *ngFor="let b of banners(); let i = index" class="dot-btn shadow-sm"
-          [class.active]="i === currentIndex()" (click)="setBanner(i)"></button>
-      </div>
+                <!-- Active Viewport -->
+                <div class="banner-image-viewport shadow-2xl rounded-5 overflow-hidden position-relative animate-pop-push">
+                  <div class="image-vignette"></div>
+                  <img [src]="getImageUrl(activeBanner().image_url)" 
+                       class="w-100 h-100 object-fit-cover" 
+                       alt="Featured"
+                     (error)="$event.target.src='https://images.unsplash.com/photo-1582555172866-f73bb12a2ab3?q=80&w=2000'">
+
+                  <div class="exclusive-chip rounded-pill px-3 py-2 small fw-bold animate-float-slow">
+                     <i class="fa-solid fa-crown me-1"></i>PREMIUM
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
   </section>
 
