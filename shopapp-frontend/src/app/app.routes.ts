@@ -9,6 +9,7 @@ import { AdminProductsComponent } from './admin/admin-products/admin-products';
 import { AdminProductFormComponent } from './admin/admin-product-form/admin-product-form';
 import { AdminCategoriesComponent } from './admin/admin-categories/admin-categories';
 import { AdminBannersComponent } from './admin/admin-banners/admin-banners';
+import { AdminOrdersComponent } from './admin/admin-orders/admin-orders';
 import { adminGuard } from './guards/admin.guard';
 import { OrderComponent } from './order/order';
 
@@ -30,7 +31,8 @@ export const routes: Routes = [
             { path: 'products/add', component: AdminProductFormComponent },
             { path: 'products/edit/:id', component: AdminProductFormComponent },
             { path: 'categories', component: AdminCategoriesComponent },
-            { path: 'banners', component: AdminBannersComponent }
+            { path: 'banners', component: AdminBannersComponent },
+            { path: 'orders', component: AdminOrdersComponent }
         ]
     }
 ];
