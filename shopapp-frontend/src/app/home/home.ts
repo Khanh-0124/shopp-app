@@ -169,4 +169,11 @@ export class Home implements OnInit, OnDestroy {
     if (thumbnail.startsWith('http://') || thumbnail.startsWith('https://')) return thumbnail;
     return `${environment.apiBaseUrl}/products/images/${thumbnail}`;
   }
+
+  scrollToProducts() {
+    const productElement = document.getElementById('product-list');
+    if (productElement) {
+      productElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
 }

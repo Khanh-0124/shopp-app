@@ -24,7 +24,7 @@
               </p>
               <div class="d-flex flex-wrap gap-3 justify-content-center justify-content-lg-start">
                 <button class="btn btn-collection rounded-pill px-4 py-2 small fw-bold"
-                  [routerLink]="activeBanner().link || '/products'">
+                  (click)="scrollToProducts()">
                   KHÁM PHÁ <i class="fa-solid fa-chevron-right ms-2 mt-1"></i>
                 </button>
                 <a href="https://zalo.me/0336969201" target="_blank"
@@ -35,28 +35,34 @@
               </div>
             </div>
 
-            <!-- Animated Image Viewport (Pop/Push) -->
+            <!-- Animated Image Viewport (Balloon Float) -->
             <div class="col-lg-6">
               <div class="banner-stack-visualizer position-relative">
-                <!-- Phantom Image Layer (Next in line) -->
-                <div class="next-phantom-layer shadow-lg" *ngIf="banners().length > 1">
-                  <img [src]="getImageUrl(banners()[(currentIndex() + 1) % banners().length].image_url)" 
-                       class="w-100 h-100 object-fit-cover" 
-                       (error)="$event.target.src='https://images.unsplash.com/photo-1513519245088-0e12902e35ca?q=80&w=2000'">
-                </div>
+                
+                <!-- Wrapper for floating elements -->
+                <div class="floating-photo-stack animate-balloon-float">
+                  <!-- Phantom Image Layer (Next in line) -->
+                  <div class="next-phantom-layer shadow-lg" *ngIf="banners().length > 1">
+                    <img [src]="getImageUrl(banners()[(currentIndex() + 1) % banners().length].image_url)" 
+                         class="w-100 h-100 object-fit-cover" 
+                         (error)="$event.target.src='https://images.unsplash.com/photo-1513519245088-0e12902e35ca?q=80&w=2000'">
+                  </div>
 
-                <!-- Active Viewport -->
-                <div class="banner-image-viewport shadow-2xl rounded-5 overflow-hidden position-relative animate-pop-push">
-                  <div class="image-vignette"></div>
-                  <img [src]="getImageUrl(activeBanner().image_url)" 
-                       class="w-100 h-100 object-fit-cover" 
-                       alt="Featured"
-                     (error)="$event.target.src='https://images.unsplash.com/photo-1582555172866-f73bb12a2ab3?q=80&w=2000'">
+                  <!-- Active Viewport -->
+                  <div class="banner-image-viewport shadow-2xl rounded-5 overflow-hidden position-relative">
+                    <img [src]="getImageUrl(activeBanner().image_url)" 
+                         class="w-100 h-100 object-fit-cover" 
+                         alt="Featured"
+                       (error)="$event.target.src='https://images.unsplash.com/photo-1582555172866-f73bb12a2ab3?q=80&w=2000'">
 
-                  <div class="exclusive-chip rounded-pill px-3 py-2 small fw-bold animate-float-slow">
-                     <i class="fa-solid fa-crown me-1"></i>PREMIUM
+                    <div class="exclusive-chip rounded-pill px-3 py-2 small fw-bold">
+                       <i class="fa-solid fa-crown me-1"></i>PREMIUM
+                    </div>
                   </div>
                 </div>
+
+                <!-- Ground Shadow -->
+                <div class="banner-floating-shadow"></div>
               </div>
             </div>
           </div>
@@ -81,41 +87,37 @@
   </div>
 
   <!-- PHOTO FRAME DYNAMIC CLASSIFICATIONS -->
-  <section class="container mb-5">
-    <div class="row g-3 justify-content-center">
+  <section class="container mb-5 overflow-hidden">
+    <div class="categories-container">
       <!-- 'All' Pill -->
-      <div class="col-6 col-md-3 col-lg-2">
-        <div class="cat-pill" [class.active]="categoryId() === 0" (click)="selectCategory(0)">
-          <div class="icon bg-indigo"><i class="fa-solid fa-layer-group"></i></div>
-          <span>Tất cả</span>
-        </div>
+      <div class="cat-pill" [class.active]="categoryId() === 0" (click)="selectCategory(0)">
+        <div class="icon bg-indigo"><i class="fa-solid fa-layer-group"></i></div>
+        <span>Tất cả</span>
       </div>
 
       <!-- Dynamic Category Pills -->
       @for (cat of categories(); track cat.id) {
-      <div class="col-6 col-md-3 col-lg-2">
-        <div class="cat-pill" [class.active]="categoryId() === cat.id" (click)="selectCategory(cat.id)">
-          <div class="icon" [ngClass]="{
-                    'bg-pink': cat.id % 4 === 1,
-                    'bg-amber': cat.id % 4 === 2,
-                    'bg-teal': cat.id % 4 === 3,
-                    'bg-indigo': cat.id % 4 === 0
-                 }">
-            <i class="fa-solid" [ngClass]="{
-                       'fa-tree': cat.name.toLowerCase().includes('gỗ'),
-                       'fa-gem': !cat.name.toLowerCase().includes('gỗ') && cat.id % 2 === 0,
-                       'fa-wand-sparkles': !cat.name.toLowerCase().includes('gỗ') && cat.id % 2 !== 0
-                    }"></i>
-          </div>
-          <span>{{ cat.name }}</span>
+      <div class="cat-pill" [class.active]="categoryId() === cat.id" (click)="selectCategory(cat.id)">
+        <div class="icon" [ngClass]="{
+                  'bg-pink': cat.id % 4 === 1,
+                  'bg-amber': cat.id % 4 === 2,
+                  'bg-teal': cat.id % 4 === 3,
+                  'bg-indigo': cat.id % 4 === 0
+               }">
+          <i class="fa-solid" [ngClass]="{
+                     'fa-tree': cat.name.toLowerCase().includes('gỗ'),
+                     'fa-gem': !cat.name.toLowerCase().includes('gỗ') && cat.id % 2 === 0,
+                     'fa-wand-sparkles': !cat.name.toLowerCase().includes('gỗ') && cat.id % 2 !== 0
+                  }"></i>
         </div>
+        <span>{{ cat.name }}</span>
       </div>
       }
     </div>
   </section>
 
   <!-- PRODUCT GRID -->
-  <section class="container mb-5">
+  <section id="product-list" class="container mb-5">
     <div class="d-flex align-items-center justify-content-between mb-4">
       <div>
         <h2 class="fw-800 tracking-tight mb-0">Mẫu Khung Ảnh Hot</h2>

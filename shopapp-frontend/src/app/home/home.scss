@@ -77,14 +77,35 @@
      &:hover { transform: rotate(0deg) scale(1.02); }
   }
 
-  .image-vignette {
-    position: absolute; inset: 0; z-index: 2;
-    background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(0,0,0,0.05) 100%);
-    pointer-events: none;
+  .banner-stack-visualizer {
+     display: flex; align-items: center; justify-content: center;
+     height: 440px; margin-top: 20px;
   }
 
-  .img-main-pop-push {
-    animation: popPush 1.2s cubic-bezier(0.4, 0, 0.2, 1) both;
+  .floating-photo-stack {
+     position: relative; width: 100%; height: 100%;
+     display: flex; align-items: center; justify-content: center;
+     z-index: 5;
+  }
+
+  .next-phantom-layer {
+     position: absolute; width: 85%; height: 85%;
+     border-radius: 20px; overflow: hidden;
+     transform: rotate(6deg) translate(35px, -15px);
+     opacity: 0.5; filter: brightness(0.9);
+     z-index: 1; transition: all 1s ease;
+     box-shadow: 10px 10px 30px rgba(0,0,0,0.08);
+     border: 4px solid #f1f5f9;
+  }
+
+  .banner-image-viewport {
+     height: 380px; width: 85%; position: relative;
+     transform: rotate(-3deg); z-index: 5;
+     transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+     box-shadow: 15px 15px 40px rgba(0,0,0,0.15);
+     border-radius: 20px; overflow: hidden;
+     border: 4px solid white; 
+     &:hover { transform: rotate(0deg) scale(1.02); }
   }
 
   .exclusive-chip {
@@ -95,17 +116,29 @@
     transform: rotate(3deg); 
   }
 
-  @keyframes popPush {
-    0% { transform: scale(1.1) translateY(10px); opacity: 0; }
-    100% { transform: scale(1) translateY(0); opacity: 1; }
+  // BALLOON FLOATING EFFECT
+  .animate-balloon-float {
+     animation: balloonFloat 4s ease-in-out infinite;
   }
 
-  @keyframes float-slow {
-    0% { transform: translateY(0px); }
-    50% { transform: translateY(-8px); }
-    100% { transform: translateY(0px); }
+  .banner-floating-shadow {
+     position: absolute; bottom: -10px; left: 50%;
+     width: 180px; height: 15px; border-radius: 50%;
+     background: rgba(0, 0, 0, 0.15); filter: blur(10px);
+     transform: translateX(-50%) scale(1);
+     z-index: 0; pointer-events: none;
+     animation: shadowScale 4s ease-in-out infinite;
   }
-  .animate-float-slow { animation: float-slow 6s ease-in-out infinite; }
+
+  @keyframes balloonFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-30px); }
+  }
+
+  @keyframes shadowScale {
+    0%, 100% { transform: translateX(-50%) scale(1); opacity: 1; }
+    50% { transform: translateX(-50%) scale(0.3); opacity: 0.2; }
+  }
 
   @keyframes fadeInLeft {
     from { opacity: 0; transform: translateX(-30px); }
@@ -115,10 +148,17 @@
 }
 
 // CATEGORY PILLS
+.categories-container {
+  display: flex; gap: 15px; overflow-x: auto; 
+  padding: 10px 5px 25px; // Extra bottom padding for shadow visibility
+  scrollbar-width: none; // Hide scrollbar for Firefox
+  &::-webkit-scrollbar { display: none; } // Hide scrollbar for Chrome/Safari
+}
+
 .cat-pill {
-  background: white; padding: 12px; border-radius: 60px;
+  background: white; padding: 12px 24px; border-radius: 60px;
   display: flex; align-items: center; gap: 12px;
-  cursor: pointer; transition: all 0.3s;
+  cursor: pointer; transition: all 0.3s; flex-shrink: 0;
   border: 1px solid #f1f5f9; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
 
   .icon {
@@ -127,10 +167,18 @@
     color: white; font-size: 1.1rem; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   }
 
-  span { font-weight: 700; color: #475569; font-size: 0.9rem; }
+  span { font-weight: 700; color: #475569; font-size: 0.95rem; }
   &:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05); border-color: #6366f1; span { color: #6366f1; } }
   &.active { background: #6366f1; border-color: #6366f1; span { color: white; } .icon { background: white; color: #6366f1; } }
   .bg-indigo { background: #6366f1; } .bg-pink { background: #ec4899; } .bg-amber { background: #f59e0b; } .bg-teal { background: #14b8a6; }
+}
+
+@media (max-width: 768px) {
+  .cat-pill {
+    padding: 8px 15px; gap: 8px;
+    .icon { width: 32px; height: 32px; font-size: 0.85rem; }
+    span { font-size: 0.8rem; }
+  }
 }
 
 .glass-product-card {
