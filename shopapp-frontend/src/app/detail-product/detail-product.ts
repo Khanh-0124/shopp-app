@@ -40,8 +40,31 @@ export class DetailProductComponent implements OnInit {
           console.log('--- DEBUG: FULL PRODUCT DATA FROM API ---');
           console.log(response);
           console.log('-----------------------------------------');
+          
+          // Đồng bộ hóa has_variants để HTML nhận diện đúng
+          response.has_variants = response.has_variants || response.hasVariants || (response.attributes && response.attributes.length > 0);
+          
           this.product.set(response);
           this.calculateInitialPrice(response);
+          
+          // --- LOGIC CỨU HỘ DỮ LIỆU ---
+          // Nếu attributes bị rỗng nhưng có variants, ta tự tạo attributes để hiện nút bấm
+          if (response.has_variants && (!response.attributes || response.attributes.length === 0) && response.variants && response.variants.length > 0) {
+              console.warn('Backend returned empty attributes. Attempting to reconstruct from variants...');
+              const reconstructedAttrs: any[] = [];
+              const numAttrs = response.variants[0].combination.length;
+              
+              for (let i = 0; i < numAttrs; i++) {
+                  const values = Array.from(new Set(response.variants.map((v: any) => v.combination[i])));
+                  reconstructedAttrs.push({
+                      name: `Lựa chọn ${i + 1}`, // Fallback name
+                      values: values
+                  });
+              }
+              response.attributes = reconstructedAttrs;
+          }
+          // ----------------------------
+          
           document.body.scrollTop = 0; // Scroll to top
         },
         error: (err) => {

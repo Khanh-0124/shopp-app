@@ -123,9 +123,24 @@ public class ProductService implements IProductService{
     public ProductResponse getProductResponseById(long productId) throws Exception {
         Product product = getProductById(productId);
         ProductResponse response = ProductResponse.fromProduct(product);
+        
+        System.out.println("DEBUG: Fetching details for Product ID: " + productId);
+        System.out.println("DEBUG: Product hasVariants in DB: " + product.getHasVariants());
+
         if (Boolean.TRUE.equals(product.getHasVariants())) {
-            response.setAttributes(mapAttributes(productId));
-            response.setVariants(mapVariants(productId));
+            List<ProductResponse.ProductAttributeResponse> attrs = mapAttributes(productId);
+            List<ProductResponse.ProductVariantResponse> variants = mapVariants(productId);
+            
+            System.out.println("DEBUG: Found Attributes count: " + attrs.size());
+            System.out.println("DEBUG: Found Variants count: " + variants.size());
+
+            response.setAttributes(attrs);
+            response.setVariants(variants);
+            
+            // Fallback: Nếu attributes bị rỗng nhưng có variants, hãy thử lấy attributes từ name của variant (nếu có)
+            if (attrs.isEmpty() && !variants.isEmpty()) {
+                System.out.println("DEBUG: Attributes empty but variants exist. Something is wrong in DB mapping.");
+            }
         }
         return response;
     }

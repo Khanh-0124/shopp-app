@@ -7,11 +7,12 @@ import { UserService } from '../../service/user.service';
 import { CategoryService } from '../../service/category.service';
 import { ToastService } from '../../service/toast.service';
 import { environment } from '../../../environments/environment';
+import { CurrencyFormatDirective } from '../../directives/currency-format.directive';
 
 @Component({
    selector: 'app-admin-product-form',
    standalone: true,
-   imports: [CommonModule, FormsModule, RouterModule],
+   imports: [CommonModule, FormsModule, RouterModule, CurrencyFormatDirective],
    template: `
     <div class="row mb-4 align-items-center">
       <div class="col-md-6">
@@ -118,7 +119,7 @@ import { environment } from '../../../environments/environment';
                     <span class="fw-800 text-dark">Bảng biến thể chi tiết ({{ productVariants.length }})</span>
                     <div class="d-flex gap-3">
                         <div class="bulk-input">
-                           <input type="number" class="form-control border-0 bg-white px-3" placeholder="Giá chung..." #bulkPrice>
+                           <input type="text" class="form-control border-0 bg-white px-3" placeholder="Giá chung..." #bulkPrice appCurrencyFormat>
                            <button type="button" class="btn btn-dark btn-sm py-1" (click)="updateAllPrices(bulkPrice.value)">Áp dụng</button>
                         </div>
                         <div class="bulk-input">
@@ -147,8 +148,8 @@ import { environment } from '../../../environments/environment';
                                <td><span class="fw-700 text-primary">{{ comboVal }}</span></td>
                             }
                             <td>
-                               <input type="number" class="form-control-custom-sm bg-light text-center fw-bold text-primary" 
-                                     [(ngModel)]="variant.price" [name]="'variantPrice' + $index" (input)="updateMinPriceFromVariants()">
+                               <input type="text" class="form-control-custom-sm bg-light text-center fw-bold text-primary" 
+                                     [(ngModel)]="variant.price" [name]="'variantPrice' + $index" (input)="updateMinPriceFromVariants()" appCurrencyFormat>
                             </td>
                             <td>
                                <input type="number" class="form-control-custom-sm bg-light text-center" 
@@ -189,13 +190,14 @@ import { environment } from '../../../environments/environment';
                      <label class="form-label-custom small fw-800 text-dark">Giá niêm yết thấp nhất (₫)</label>
                      <div class="input-group-custom">
                         <i class="fa-solid fa-hand-holding-dollar text-muted"></i>
-                        <input type="number" class="form-control-custom border-2 fw-800"
+                        <input type="text" class="form-control-custom border-2 fw-800"
                              [(ngModel)]="productData.price" name="price" 
                              [required]="productVariants.length === 0" 
                              [readonly]="productVariants.length > 0"
-                             min="1000" #price="ngModel"
+                             #price="ngModel"
                              [class.is-invalid]="price.invalid && price.touched"
-                             [style.border-color]="productVariants.length > 0 ? '#6366f1' : '#e2e8f0'">
+                             [style.border-color]="productVariants.length > 0 ? '#6366f1' : '#e2e8f0'"
+                             appCurrencyFormat>
                      </div>
                   </div>
                </div>
