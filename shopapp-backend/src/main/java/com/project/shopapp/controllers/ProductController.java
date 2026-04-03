@@ -126,12 +126,28 @@ public class ProductController {
     @GetMapping("/images/{imageName:.+}")
     public ResponseEntity<?> viewImage(@PathVariable String imageName) {
         try {
-            java.nio.file.Path imagePath = Paths.get("uploads/"+imageName);
+            // Decode URL-encoded filename (%20 → space, %E2%80%AF → narrow no-break space, v.v.)
+            String decodedImageName = java.net.URLDecoder.decode(imageName, java.nio.charset.StandardCharsets.UTF_8);
+            java.nio.file.Path imagePath = Paths.get("uploads/" + decodedImageName);
             UrlResource resource = new UrlResource(imagePath.toUri());
             if (resource.exists()) {
-                return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(resource);
+                // Tự động xác định content type theo đuôi file
+                String contentType = "image/jpeg";
+                String lower = decodedImageName.toLowerCase();
+                if (lower.endsWith(".png")) contentType = "image/png";
+                else if (lower.endsWith(".gif")) contentType = "image/gif";
+                else if (lower.endsWith(".webp")) contentType = "image/webp";
+                return ResponseEntity.ok()
+                        .contentType(org.springframework.http.MediaType.parseMediaType(contentType))
+                        .body(resource);
             } else {
-                return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(new UrlResource(Paths.get("uploads/notfound.jpg").toUri()));
+                // Thử tìm file không decode (fallback)
+                java.nio.file.Path rawPath = Paths.get("uploads/" + imageName);
+                UrlResource rawResource = new UrlResource(rawPath.toUri());
+                if (rawResource.exists()) {
+                    return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(rawResource);
+                }
+                return ResponseEntity.notFound().build();
             }
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
