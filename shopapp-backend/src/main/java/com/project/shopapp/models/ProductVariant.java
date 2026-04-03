@@ -18,7 +18,10 @@ public class ProductVariant {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id")
+    @JoinColumn(
+        name = "product_id",
+        foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT) // Tránh lỗi FK errno 150
+    )
     private Product product;
 
     private Float price;
@@ -31,8 +34,14 @@ public class ProductVariant {
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
         name = "variant_attribute_values",
-        joinColumns = @JoinColumn(name = "variant_id"),
-        inverseJoinColumns = @JoinColumn(name = "attribute_value_id")
+        joinColumns = @JoinColumn(
+            name = "variant_id",
+            foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT)
+        ),
+        inverseJoinColumns = @JoinColumn(
+            name = "attribute_value_id",
+            foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT)
+        )
     )
     private List<ProductAttributeValue> attributeValues;
 }
