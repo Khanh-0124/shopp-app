@@ -35,9 +35,9 @@ public class WebSecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class)
-                .cors(Customizer.withDefaults()) // Use the bean below
+                .cors(Customizer.withDefaults()) // Enable CORS
                 .csrf(AbstractHttpConfigurer::disable)
+                .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(requests -> {
                     requests
                             .requestMatchers(OPTIONS, "/**").permitAll() // Cho phép tất cả lệnh OPTIONS

@@ -34,7 +34,11 @@ public class JwtTokenFilter extends OncePerRequestFilter{
             throws ServletException, IOException {
         try {
             if (request.getMethod().equalsIgnoreCase("OPTIONS")) {
-                filterChain.doFilter(request, response);
+                response.setHeader("Access-Control-Allow-Origin", "http://localhost:4300");
+                response.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE, PUT, PATCH");
+                response.setHeader("Access-Control-Max-Age", "3600");
+                response.setHeader("Access-Control-Allow-Headers", "x-requested-with, authorization, content-type");
+                response.setStatus(HttpServletResponse.SC_OK);
                 return;
             }
             if(isBypassToken(request)) {
