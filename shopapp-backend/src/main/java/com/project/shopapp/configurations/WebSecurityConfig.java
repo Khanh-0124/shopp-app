@@ -9,7 +9,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -32,24 +31,6 @@ public class WebSecurityConfig {
     @Value("${api.prefix}")
     private String apiPrefix;
 
-    /**
-     * Bỏ qua hoàn toàn Spring Security cho các tài nguyên public.
-     * Khác với permitAll(), web.ignoring() đảm bảo không có filter nào chặn request.
-     */
-    @Bean
-    public WebSecurityCustomizer webSecurityCustomizer() {
-        return (web) -> web.ignoring().requestMatchers(
-                "/api/v1/products/images/**",
-                "/api/v1/products/**",
-                "/api/v1/categories/**",
-                "/api/v1/roles/**",
-                "/api/v1/banners/**",
-                "/api/v1/orders/**",
-                "/api/v1/order_details/**",
-                "/api/v1/users/register",
-                "/api/v1/users/login"
-        );
-    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
