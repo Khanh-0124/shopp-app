@@ -66,26 +66,30 @@ public class JwtTokenFilter extends OncePerRequestFilter{
         }
 
     }
-    private boolean isBypassToken(@NonNull  HttpServletRequest request) {
-        final String servletPath = request.getServletPath();
+    private boolean isBypassToken(@NonNull HttpServletRequest request) {
+        final String requestURI = request.getRequestURI();
         final String method = request.getMethod();
 
-        if (method.equals("GET") && (
-                servletPath.contains(String.format("/%s/products/images", apiPrefix)) ||
-                servletPath.contains(String.format("/%s/banners", apiPrefix)) ||
-                servletPath.contains(String.format("/%s/roles", apiPrefix)) ||
-                servletPath.contains(String.format("/%s/categories", apiPrefix)) ||
-                servletPath.contains(String.format("/%s/products", apiPrefix)) ||
-                servletPath.contains(String.format("/%s/orders", apiPrefix))
-        )) {
-            return true;
+        // Bypass check for GET requests to public resources
+        if (method.equals("GET")) {
+            if (requestURI.contains("/products/images") ||
+                requestURI.contains("/banners") ||
+                requestURI.contains("/roles") ||
+                requestURI.contains("/categories") ||
+                requestURI.contains("/products") ||
+                requestURI.contains("/orders")
+            ) {
+                return true;
+            }
         }
 
-        if (method.equals("POST") && (
-                servletPath.contains(String.format("/%s/users/register", apiPrefix)) ||
-                servletPath.contains(String.format("/%s/users/login", apiPrefix))
-        )) {
-            return true;
+        // Bypass check for login and registration
+        if (method.equals("POST")) {
+            if (requestURI.contains("/users/register") ||
+                requestURI.contains("/users/login")
+            ) {
+                return true;
+            }
         }
 
         return false;
